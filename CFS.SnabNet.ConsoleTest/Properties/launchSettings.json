@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CFS.SnabNet.ConsoleTest": {
+      "commandName": "Project",
+      "commandLineArgs": "examples/mega-test-compressed.snab"
+    }
+  }
+}
