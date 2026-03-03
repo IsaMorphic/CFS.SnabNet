@@ -1,7 +1,4 @@
-﻿
-using CFS.SnabNet.Values;
-
-namespace CFS.SnabNet
+﻿namespace CFS.SnabNet
 {
     public interface ISnabStruct
     {

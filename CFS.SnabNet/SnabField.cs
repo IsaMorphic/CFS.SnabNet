@@ -1,6 +1,4 @@
-﻿
-
-namespace CFS.SnabNet.Values
+﻿namespace CFS.SnabNet
 {
     public record SnabField(byte TypeId, object? Value);
 }

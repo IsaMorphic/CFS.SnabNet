@@ -1,5 +1,4 @@
-﻿using CFS.SnabNet.Values;
-using System.Text;
+﻿using System.Text;
 
 namespace CFS.SnabNet.Types
 {
