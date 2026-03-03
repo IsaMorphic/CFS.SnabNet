@@ -5,31 +5,46 @@ namespace CFS.SnabNet
 {
     public class SnabReader : IDisposable
     {
-        private static readonly ISnabType[] _sTypes = [
-            new SnabStruct(),
-            new SnabArray(),
-            new SnabString(),
-            new SnabReal(),
-            new SnabInteger(),
-            new SnabBoolean(),
-            new SnabUndefined(),
-            new SnabNull(),
-            new SnabBuffer(),
-        ];
-
-        private static readonly IReadOnlyDictionary<byte, ISnabType> _sTypeMap;
+        private static readonly IDictionary<byte, ISnabType> _sTypeMap;
 
         static SnabReader()
         {
-            Dictionary<byte, ISnabType> typeMap = new();
-            foreach (ISnabType type in _sTypes)
+            IReadOnlyList<ISnabType> types = [
+                new SnabStruct(),
+                new SnabArray(),
+                new SnabString(),
+                new SnabReal(),
+                new SnabInteger(),
+                new SnabBoolean(),
+                new SnabUndefined(),
+                new SnabNull(),
+                new SnabBuffer(),
+            ];
+
+            _sTypeMap = new Dictionary<byte, ISnabType>();
+            foreach (ISnabType type in types)
             {
                 foreach (byte typeId in type.TypeIds)
                 {
-                    typeMap.Add(typeId, type);
+                    _sTypeMap.Add(typeId, type);
                 }
             }
-            _sTypeMap = typeMap;
+        }
+
+        public static void RegisterType(ISnabType type)
+        {
+            IEnumerable<byte> conflictIds = _sTypeMap.Keys.Where(type.TypeIds.Contains);
+            if (conflictIds.Any())
+            {
+                throw new ArgumentException($"SnabReader already contains a mapping for typeIds: {string.Join(',', conflictIds)}");
+            }
+            else
+            {
+                foreach (byte typeId in type.TypeIds)
+                {
+                    _sTypeMap.Add(typeId, type);
+                }
+            }
         }
 
         private readonly bool _leaveOpen;
@@ -48,9 +63,9 @@ namespace CFS.SnabNet
 
             if (Header.Flags.HasFlag(SnabFlags.Compressed))
             {
-                BaseStream = new ZLibStream(stream, CompressionMode.Decompress, false);
+                BaseStream = new ZLibStream(stream, CompressionMode.Decompress, leaveOpen);
             }
-            else 
+            else
             {
                 BaseStream = stream;
             }
@@ -71,7 +86,7 @@ namespace CFS.SnabNet
         public object? Deserialize()
         {
             int typeId = BaseStream.ReadByte();
-            switch (typeId) 
+            switch (typeId)
             {
                 case 0x01:
                 case 0x02:
@@ -88,7 +103,7 @@ namespace CFS.SnabNet
         {
             if (!disposedValue)
             {
-                if (disposing && !_leaveOpen)
+                if (disposing && (!_leaveOpen || BaseStream is ZLibStream))
                 {
                     BaseStream.Dispose();
                 }
