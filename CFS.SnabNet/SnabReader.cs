@@ -5,38 +5,42 @@ namespace CFS.SnabNet
 {
     public class SnabReader : IDisposable
     {
-        private static readonly IDictionary<byte, ISnabType> _sTypeMap;
+        private static readonly Dictionary<byte, ISnabType> _sTypeMap = new();
 
         static SnabReader()
         {
-            IReadOnlyList<ISnabType> types = [
-                new SnabStruct(),
-                new SnabArray(),
-                new SnabString(),
-                new SnabReal(),
-                new SnabInteger(),
-                new SnabBoolean(),
-                new SnabUndefined(),
-                new SnabNull(),
-                new SnabBuffer(),
-            ];
+            RegisterType<SnabStruct>();
+            RegisterType<SnabArray>();
+            RegisterType<SnabString>();
+            RegisterType<SnabReal>();
+            RegisterType<SnabInteger>();
+            RegisterType<SnabBoolean>();
+            RegisterType<SnabUndefined>();
+            RegisterType<SnabNull>();
+            RegisterType<SnabBuffer>();
+        }
 
-            _sTypeMap = new Dictionary<byte, ISnabType>();
-            foreach (ISnabType type in types)
+        internal static ISnabType GetTypeById(byte typeId)
+        {
+            if (_sTypeMap.TryGetValue(typeId, out ISnabType? type))
             {
-                foreach (byte typeId in type.TypeIds)
-                {
-                    _sTypeMap.Add(typeId, type);
-                }
+                return type;
+            }
+            else
+            {
+                throw new ArgumentException($"Unknown typeId {typeId}");
             }
         }
 
-        public static void RegisterType(ISnabType type)
+        public static void RegisterType<T>() 
+            where T : ISnabType, new()
         {
+            T type = new();
+
             IEnumerable<byte> conflictIds = _sTypeMap.Keys.Where(type.TypeIds.Contains);
             if (conflictIds.Any())
             {
-                throw new ArgumentException($"SnabReader already contains a mapping for typeIds: {string.Join(',', conflictIds)}");
+                throw new ArgumentException($"SnabReader already contains a mapping for typeIds: {string.Join(", ", conflictIds)}");
             }
             else
             {
@@ -68,18 +72,6 @@ namespace CFS.SnabNet
             else
             {
                 BaseStream = stream;
-            }
-        }
-
-        internal static ISnabType GetTypeById(byte typeId)
-        {
-            if (_sTypeMap.TryGetValue(typeId, out ISnabType? type))
-            {
-                return type;
-            }
-            else
-            {
-                throw new InvalidDataException($"Unknown typeId {typeId}");
             }
         }
 
