@@ -2,19 +2,19 @@
 
 namespace CFS.SnabNet.Types
 {
-    internal class SnabArray : ISnabType<IList<object?>>
+    internal class SnabArray : ISnabType<IReadOnlyList<object?>>
     {
         public HashSet<byte> TypeIds { get; }
 
         public SnabArray()
         {
-            TypeIds = new HashSet<byte> { 0x02 };
+            TypeIds = new HashSet<byte> { SnabType.Array };
         }
 
-        public IList<object?> ReadFromInstance(SnabReader instance, byte typeId)
+        public IReadOnlyList<object?> ReadFromInstance(SnabReader instance, byte typeId)
         {
-            if(typeId != 0x02)
-                throw new InvalidDataException($"Invalid typeId {typeId} for SnabStruct");
+            if(typeId != SnabType.Array)
+                throw new ArgumentException($"Invalid typeId {typeId} for SnabArray", nameof(typeId));
 
             List<object?> arrayData = new();
             using (BinaryReader reader = new(instance.BaseStream, Encoding.UTF8, true))
@@ -22,7 +22,7 @@ namespace CFS.SnabNet.Types
                 byte innerTypeId = reader.ReadByte();
                 while (innerTypeId != 0x00)
                 {
-                    ISnabType innerType = SnabReader.GetTypeById(innerTypeId);
+                    ISnabType innerType = SnabLibrary.GetTypeById(innerTypeId);
                     object? element = innerType.ReadFromInstance(instance, innerTypeId);
 
                     arrayData.Add(element);
@@ -31,6 +31,27 @@ namespace CFS.SnabNet.Types
             }
 
             return arrayData;
+        }
+
+        public void WriteToInstance(SnabWriter instance, byte typeId, object? obj)
+        {
+            if (typeId != SnabType.Array)
+                throw new ArgumentException($"Invalid typeId {typeId} for SnabArray", nameof(typeId));
+
+            switch (obj) 
+            {
+                case IReadOnlyList<object?> list:
+                    foreach (var element in list)
+                    {
+                        byte elemTypeId = SnabLibrary.GetTypeIdByValue(element);
+                        instance.BaseStream.WriteByte(elemTypeId);
+
+                        ISnabType elemType = SnabLibrary.GetTypeById(elemTypeId);
+                        elemType.WriteToInstance(instance, elemTypeId, element);
+                    }
+                    instance.BaseStream.WriteByte(0x00);
+                    break;
+            }
         }
     }
 }

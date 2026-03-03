@@ -6,17 +6,29 @@
 
         public SnabBoolean()
         {
-            TypeIds = new HashSet<byte> { 0x07, 0x08 };
+            TypeIds = new HashSet<byte> { SnabType.False, SnabType.True };
         }
 
         public bool ReadFromInstance(SnabReader reader, byte typeId)
         {
             return typeId switch
             {
-                0x07 => false,
-                0x08 => true,
-                _ => throw new InvalidDataException($"Invalid typeId {typeId} for SnabBoolean")
+                SnabType.False => false,
+                SnabType.True => true,
+                _ => throw new ArgumentException($"Invalid typeId {typeId} for SnabBoolean", nameof(typeId))
             };
+        }
+
+        public void WriteToInstance(SnabWriter instance, byte typeId, object? obj)
+        {
+            switch ((typeId, obj)) 
+            {
+                case (SnabType.False, false):
+                case (SnabType.True, true):
+                    break;
+                default:
+                    throw new ArgumentException($"Invalid typeId {typeId} for SnabBoolean", nameof(typeId));
+            }
         }
     }
 }

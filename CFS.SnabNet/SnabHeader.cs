@@ -2,17 +2,17 @@
 {
     public class SnabHeader
     {
-        public byte MajorVersion { get; private init; }
+        public byte MajorVersion { get; internal set; }
 
-        public byte MinorVersion { get; private init; }
+        public byte MinorVersion { get; internal set; }
 
-        public SnabFlags Flags { get; private init; }
+        public SnabFlags Flags { get; internal set; }
 
-        public uint LangId { get; private init; }
+        public uint LangId { get; internal set; }
 
-        public uint Checksum { get; private init; }
+        public uint Checksum { get; internal set; }
 
-        public uint Length { get; private init; }
+        public uint Length { get; internal set; }
 
         internal static SnabHeader ReadFromStream(Stream stream)
         {
@@ -26,7 +26,7 @@
             stream.ReadExactly(bytesSpan[..2]);
             if (!BitConverter.IsLittleEndian)
             {
-                bytesSpan[..1].Reverse();
+                bytesSpan[..2].Reverse();
             }
             flags = (SnabFlags)BitConverter.ToUInt16(bytesSpan[..2]);
 
@@ -63,6 +63,42 @@
                 Checksum = checksum,
                 Length = length,
             };
+        }
+
+        internal void WriteToStream(Stream stream)
+        {
+            Span<byte> bytesSpan = stackalloc byte[sizeof(uint)];
+
+            stream.WriteByte(MajorVersion);
+            stream.WriteByte(MinorVersion);
+
+            BitConverter.TryWriteBytes(bytesSpan, (ushort)Flags);
+            if (!BitConverter.IsLittleEndian)
+            {
+                bytesSpan[..2].Reverse();
+            }
+            stream.Write(bytesSpan[..2]);
+
+            BitConverter.TryWriteBytes(bytesSpan, LangId);
+            if (!BitConverter.IsLittleEndian) 
+            {
+                bytesSpan.Reverse();
+            }
+            stream.Write(bytesSpan);
+
+            BitConverter.TryWriteBytes(bytesSpan, Checksum);
+            if (!BitConverter.IsLittleEndian)
+            {
+                bytesSpan.Reverse();
+            }
+            stream.Write(bytesSpan);
+
+            BitConverter.TryWriteBytes(bytesSpan, Length);
+            if (!BitConverter.IsLittleEndian)
+            {
+                bytesSpan.Reverse();
+            }
+            stream.Write(bytesSpan);
         }
     }
 }
