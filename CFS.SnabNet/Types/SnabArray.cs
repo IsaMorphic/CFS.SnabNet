@@ -1,8 +1,9 @@
-﻿using System.Text;
+﻿using System.Collections;
+using System.Text;
 
 namespace CFS.SnabNet.Types
 {
-    internal class SnabArray : ISnabType<IReadOnlyList<object?>>
+    internal class SnabArray : ISnabType<IList<object?>>
     {
         public HashSet<byte> TypeIds { get; }
 
@@ -11,7 +12,7 @@ namespace CFS.SnabNet.Types
             TypeIds = new HashSet<byte> { SnabType.Array };
         }
 
-        public IReadOnlyList<object?> ReadFromInstance(SnabReader instance, byte typeId)
+        public IList<object?> ReadFromInstance(SnabReader instance, byte typeId)
         {
             if(typeId != SnabType.Array)
                 throw new ArgumentException($"Invalid typeId {typeId} for SnabArray", nameof(typeId));
@@ -19,14 +20,17 @@ namespace CFS.SnabNet.Types
             List<object?> arrayData = new();
             using (BinaryReader reader = new(instance.BaseStream, Encoding.UTF8, true))
             {
-                byte innerTypeId = reader.ReadByte();
-                while (innerTypeId != 0x00)
+                byte elemTypeId = reader.ReadByte();
+                while (elemTypeId != 0x00)
                 {
-                    ISnabType innerType = SnabLibrary.GetTypeById(innerTypeId);
-                    object? element = innerType.ReadFromInstance(instance, innerTypeId);
+                    if (!instance.Info.Flags.HasFlag(SnabFlags.User) && elemTypeId > SnabType.LastReserved)
+                        throw new ArgumentException($"Cannot deserialize user-defined typeId {elemTypeId}; instance does not allow it.", nameof(instance));
+
+                    ISnabType elemType = SnabLibrary.GetTypeById(elemTypeId);
+                    object? element = elemType.ReadFromInstance(instance, elemTypeId);
 
                     arrayData.Add(element);
-                    innerTypeId = reader.ReadByte();
+                    elemTypeId = reader.ReadByte();
                 }
             }
 
@@ -38,20 +42,18 @@ namespace CFS.SnabNet.Types
             if (typeId != SnabType.Array)
                 throw new ArgumentException($"Invalid typeId {typeId} for SnabArray", nameof(typeId));
 
-            switch (obj) 
+            foreach (var element in (obj as IEnumerable) ?? 
+                throw new ArgumentException($"Object of type '{obj?.GetType().FullName ?? "null"}' cannot be serialized as SnabArray.", nameof(obj)))
             {
-                case IReadOnlyList<object?> list:
-                    foreach (var element in list)
-                    {
-                        byte elemTypeId = SnabLibrary.GetTypeIdByValue(element);
-                        instance.BaseStream.WriteByte(elemTypeId);
+                byte elemTypeId = SnabLibrary.GetTypeIdByValue(element);
+                if (!instance.Info.Flags.HasFlag(SnabFlags.User) && elemTypeId > SnabType.LastReserved)
+                    throw new ArgumentException($"Cannot serialize user-defined typeId {elemTypeId}; instance does not allow it.", nameof(instance));
+                instance.BaseStream.WriteByte(elemTypeId);
 
-                        ISnabType elemType = SnabLibrary.GetTypeById(elemTypeId);
-                        elemType.WriteToInstance(instance, elemTypeId, element);
-                    }
-                    instance.BaseStream.WriteByte(0x00);
-                    break;
+                ISnabType elemType = SnabLibrary.GetTypeById(elemTypeId);
+                elemType.WriteToInstance(instance, elemTypeId, element);
             }
+            instance.BaseStream.WriteByte(0x00);
         }
     }
 }

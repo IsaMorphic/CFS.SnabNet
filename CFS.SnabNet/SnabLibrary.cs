@@ -1,4 +1,5 @@
 ﻿using CFS.SnabNet.Types;
+using System.Collections;
 using System.Text;
 
 namespace CFS.SnabNet
@@ -47,12 +48,8 @@ namespace CFS.SnabNet
             {
                 // Struct types
                 case ISnabStruct:
-                case IDictionary<string, object?>:
+                case IReadOnlyDictionary<string, object?>:
                     return 0x01;
-
-                // Array types
-                case IReadOnlyList<object?>:
-                    return 0x02;
 
                 // String types
                 case char:
@@ -93,6 +90,10 @@ namespace CFS.SnabNet
                 // Buffer types
                 case byte[]:
                     return 0x0B;
+
+                // Array types
+                case IEnumerable:
+                    return 0x02;
 
                 default:
                     throw new ArgumentException($"Unsupported value type {value.GetType().FullName}", nameof(value));

@@ -32,10 +32,10 @@ namespace CFS.SnabNet.SourceGenerators
         public SourceText GenerateSourceOutput(TypeDeclarationSyntax oldTypeDef)
         {
             MethodDeclarationSyntax methodDef = MethodDeclaration(
-                ParseTypeName("IReadOnlyDictionary<string, SnabField>"),
+                ParseTypeName("IReadOnlyDictionary<string, object?>"),
                 "Create").AddModifiers(ParseToken("public"))
                 .AddBodyStatements(
-                    ParseStatement("Dictionary<string, SnabField> structData = new();")
+                    ParseStatement("Dictionary<string, object?> structData = new();")
                 );
             foreach (PropertyDeclarationSyntax propDef in oldTypeDef.ChildNodes()
                 .Where(x => x is PropertyDeclarationSyntax)

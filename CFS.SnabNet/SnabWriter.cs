@@ -41,7 +41,7 @@ namespace CFS.SnabNet
             }
         }
 
-        public void Serialize(object? obj)
+        public void Serialize(object obj)
         {
             if (_isCompleted) 
             {
@@ -58,7 +58,7 @@ namespace CFS.SnabNet
                     type.WriteToInstance(this, typeId, obj);
                     break;
                 default:
-                    throw new ArgumentException("Value must be either ISnabStruct or IReadOnlyList.", nameof(obj));
+                    throw new ArgumentException("Object must be either IReadOnlyDictionary<string, object?>, IEnumerable, or ISnabStruct.", nameof(obj));
             }
 
             if (BaseStream != _buffer)

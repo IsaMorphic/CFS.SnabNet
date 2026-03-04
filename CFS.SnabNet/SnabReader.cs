@@ -28,7 +28,7 @@ namespace CFS.SnabNet
             }
         }
 
-        public object? Deserialize()
+        public object Deserialize()
         {
             int typeId = BaseStream.ReadByte();
             switch (typeId)
@@ -36,7 +36,7 @@ namespace CFS.SnabNet
                 case 0x01:
                 case 0x02:
                     ISnabType type = SnabLibrary.GetTypeById((byte)typeId);
-                    return type.ReadFromInstance(this, (byte)typeId);
+                    return type.ReadFromInstance(this, (byte)typeId)!;
                 case > 0:
                     throw new InvalidDataException($"Invalid typeId {typeId}; SNAB data root must be either struct or array.");
                 default:

@@ -33,5 +33,15 @@ using CFS.SnabNet.ConsoleTest;
 
 using (SnabWriter writer = new(File.Create("test.snab"), SnabFlags.None)) 
 {
-    writer.Serialize(new TestStruct { IntField = 3 });
+    writer.Serialize(new TestStruct(3, [3, 4, 5]));
 }
+
+dynamic parsedData;
+using (SnabReader reader = new(File.OpenRead("test.snab"))) 
+{
+    parsedData = reader.Deserialize();
+}
+
+Console.WriteLine(parsedData.int_field);
+Console.WriteLine($"[{string.Join(", ", parsedData.array_field)}]");
+Console.WriteLine(parsedData.undefined_field);

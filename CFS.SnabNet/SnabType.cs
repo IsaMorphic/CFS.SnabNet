@@ -25,5 +25,7 @@
         public const byte Null = 0x0A;
 
         public const byte Buffer = 0x0B;
+
+        public const byte LastReserved = 0x7F;
     }
 }

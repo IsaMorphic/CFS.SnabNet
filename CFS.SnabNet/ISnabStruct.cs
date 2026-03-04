@@ -2,6 +2,6 @@
 {
     public interface ISnabStruct
     {
-        IReadOnlyDictionary<string, SnabField> Create();
+        IReadOnlyDictionary<string, object?> Create();
     }
 }

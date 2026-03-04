@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Dynamic;
+using System.Text;
 
 namespace CFS.SnabNet.Types
 {
@@ -16,12 +17,15 @@ namespace CFS.SnabNet.Types
             if (typeId != SnabType.Struct)
                 throw new ArgumentException($"Invalid typeId {typeId} for SnabStruct", nameof(typeId));
 
-            Dictionary<string, object?> structData = new();
+            IDictionary<string, object?> structData = new ExpandoObject();
             using (BinaryReader reader = new(instance.BaseStream, Encoding.UTF8, true))
             {
                 byte innerTypeId = reader.ReadByte();
                 while (innerTypeId != 0x00)
                 {
+                    if (!instance.Info.Flags.HasFlag(SnabFlags.User) && innerTypeId > SnabType.LastReserved)
+                        throw new ArgumentException($"Cannot deserialize user-defined typeId {innerTypeId}; instance does not allow it.", nameof(instance));
+
                     List<char> strBuf = new();
                     char nextChar = reader.ReadChar();
                     while (nextChar != '\x00')
@@ -47,41 +51,30 @@ namespace CFS.SnabNet.Types
             if (typeId != SnabType.Struct)
                 throw new ArgumentException($"Invalid typeId {typeId} for SnabStruct", nameof(typeId));
 
-            switch (obj) 
+            switch ((obj as ISnabStruct)?.Create() ?? obj) 
             {
-                case ISnabStruct @struct:
-                    IReadOnlyDictionary<string, SnabField> structData = @struct.Create();
-                    using (BinaryWriter writer = new(instance.BaseStream, Encoding.UTF8, true))
-                    {
-                        foreach ((string key, (byte typeIdOrZero, object? value)) in structData)
-                        {
-                            byte innerTypeId = typeIdOrZero == 0x00 ?
-                                SnabLibrary.GetTypeIdByValue(value) :
-                                typeIdOrZero;
-                            writer.Write(innerTypeId);
-
-                            writer.Write(key.ToCharArray());
-                            writer.Write('\x00');
-
-                            ISnabType innerType = SnabLibrary.GetTypeById(innerTypeId);
-                            innerType.WriteToInstance(instance, innerTypeId, value);
-                        }
-                        writer.Write((byte)0x00);
-                    }
-                    break;
                 case IReadOnlyDictionary<string, object?> dict:
                     using (BinaryWriter writer = new(instance.BaseStream, Encoding.UTF8, true))
                     {
                         foreach ((string key, object? value) in dict)
                         {
-                            byte innerTypeId = SnabLibrary.GetTypeIdByValue(value);
+                            byte innerTypeId = value is SnabField field ? 
+                                field.TypeId : (byte)0x00;
+                            innerTypeId = innerTypeId == 0x00 ?
+                                SnabLibrary.GetTypeIdByValue(
+                                    (value as SnabField)?.Value ?? value
+                                    ) : innerTypeId;
+
+                            if (!instance.Info.Flags.HasFlag(SnabFlags.User) && innerTypeId > SnabType.LastReserved)
+                                throw new ArgumentException($"Cannot serialize user-defined typeId {innerTypeId}; instance does not allow it.", nameof(instance));
                             writer.Write(innerTypeId);
 
                             writer.Write(key.ToCharArray());
                             writer.Write('\x00');
 
                             ISnabType innerType = SnabLibrary.GetTypeById(innerTypeId);
-                            innerType.WriteToInstance(instance, innerTypeId, value);
+                            innerType.WriteToInstance(instance, innerTypeId, 
+                                (value as SnabField)?.Value ?? value);
                         }
                         writer.Write((byte)0x00);
                     }
