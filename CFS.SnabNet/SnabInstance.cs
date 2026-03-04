@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CFS.SnabNet
 {
-    public static class SnabLibrary
+    public class SnabInstance
     {
         public const byte MAJOR_VERSION = 1;
         public const byte MINOR_VERSION = 0;
@@ -15,9 +15,9 @@ namespace CFS.SnabNet
                 Encoding.ASCII.GetBytes(_LANG_ID)
                 );
 
-        private static readonly Dictionary<byte, ISnabType> _sTypeMap = new();
+        private readonly SortedDictionary<byte, ISnabType> _typeMap = new();
 
-        static SnabLibrary()
+        public SnabInstance()
         {
             RegisterType<SnabStruct>();
             RegisterType<SnabArray>();
@@ -30,9 +30,9 @@ namespace CFS.SnabNet
             RegisterType<SnabBuffer>();
         }
 
-        internal static ISnabType GetTypeById(byte typeId)
+        internal ISnabType GetTypeById(byte typeId)
         {
-            if (_sTypeMap.TryGetValue(typeId, out ISnabType? type))
+            if (_typeMap.TryGetValue(typeId, out ISnabType? type))
             {
                 return type;
             }
@@ -42,25 +42,26 @@ namespace CFS.SnabNet
             }
         }
 
-        internal static byte GetTypeIdByValue(object? value)
+        internal byte GetTypeIdByValue(object? value)
         {
             switch (value)
             {
                 // Struct types
                 case ISnabStruct:
+                case IDictionary<string, object?>:
                 case IReadOnlyDictionary<string, object?>:
-                    return 0x01;
+                    return SnabType.Struct;
 
                 // String types
                 case char:
                 case string:
-                    return 0x03;
+                    return SnabType.String;
 
                 // Real types
                 case Half:
                 case float:
                 case double:
-                    return 0x05;
+                    return SnabType.Real;
 
                 // Integer types
                 case byte:
@@ -73,50 +74,64 @@ namespace CFS.SnabNet
                 case long:
                 case nint:
                 case nuint:
-                    return 0x06;
+                    return SnabType.Integer;
 
                 // Boolean types
                 case false:
-                    return 0x07;
+                    return SnabType.False;
                 case true:
-                    return 0x08;
+                    return SnabType.True;
 
                 // Null types
                 case Values.SnabUndefined:
-                    return 0x09;
+                    return SnabType.Undefined;
                 case null:
-                    return 0x0A;
+                    return SnabType.Null;
 
                 // Buffer types
                 case byte[]:
-                    return 0x0B;
+                    return SnabType.Buffer;
 
                 // Array types
                 case IEnumerable:
-                    return 0x02;
+                    return SnabType.Array;
 
                 default:
-                    throw new ArgumentException($"Unsupported value type {value.GetType().FullName}", nameof(value));
+                    return _typeMap
+                        .SkipWhile(x => x.Key <= SnabType.LastReserved)
+                        .Select(x => (byte?)x.Value.GetTypeIdForValue(value))
+                        .FirstOrDefault(id => id > SnabType.None) ?? 
+                        throw new ArgumentException($"Unsupported value type {value.GetType().FullName}", nameof(value));
             }
         }
 
-        public static void RegisterType<T>()
+        public void RegisterType<T>()
             where T : ISnabType, new()
         {
             T type = new();
 
-            IEnumerable<byte> conflictIds = _sTypeMap.Keys.Where(type.TypeIds.Contains);
+            IEnumerable<byte> conflictIds = _typeMap.Keys.Where(type.TypeIds.Contains);
             if (conflictIds.Any())
             {
-                throw new ArgumentException($"SnabReader already contains a mapping for typeIds: {string.Join(", ", conflictIds)}", nameof(T));
+                throw new ArgumentException($"Instance already contains a mapping for typeIds: {string.Join(", ", conflictIds)}", nameof(T));
             }
             else
             {
                 foreach (byte typeId in type.TypeIds)
                 {
-                    _sTypeMap.Add(typeId, type);
+                    _typeMap.Add(typeId, type);
                 }
             }
+        }
+
+        public SnabReader CreateReader(Stream stream, bool leaveOpen = false)
+        {
+            return new SnabReader(this, stream, leaveOpen);
+        }
+
+        public SnabWriter CreateWriter(Stream stream, SnabFlags flags, bool leaveOpen = false)
+        {
+            return new SnabWriter(this, stream, flags, leaveOpen);
         }
     }
 }

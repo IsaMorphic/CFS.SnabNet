@@ -4,20 +4,22 @@ namespace CFS.SnabNet
 {
     public class SnabReader : IDisposable
     {
+        private readonly SnabInstance _instance;
+
         private readonly bool _leaveOpen;
 
-        private bool disposedValue;
+        private bool _disposedValue;
 
         internal SnabHeader Info { get; }
 
         public Stream BaseStream { get; }
 
-        public SnabReader(Stream stream, bool leaveOpen = false)
+        internal SnabReader(SnabInstance instance, Stream stream, bool leaveOpen)
         {
+            _instance = instance;
             _leaveOpen = leaveOpen;
 
             Info = SnabHeader.ReadFromStream(stream);
-
             if (Info.Flags.HasFlag(SnabFlags.Compressed))
             {
                 BaseStream = new ZLibStream(stream, CompressionMode.Decompress, leaveOpen);
@@ -28,16 +30,20 @@ namespace CFS.SnabNet
             }
         }
 
+        internal byte GetTypeIdByValue(object? value) => _instance.GetTypeIdByValue(value);
+
+        internal ISnabType GetTypeById(byte typeId) => _instance.GetTypeById(typeId);
+
         public object Deserialize()
         {
             int typeId = BaseStream.ReadByte();
             switch (typeId)
             {
-                case 0x01:
-                case 0x02:
-                    ISnabType type = SnabLibrary.GetTypeById((byte)typeId);
+                case SnabType.Struct:
+                case SnabType.Array:
+                    ISnabType type = GetTypeById((byte)typeId);
                     return type.ReadFromInstance(this, (byte)typeId)!;
-                case > 0:
+                case > SnabType.None:
                     throw new InvalidDataException($"Invalid typeId {typeId}; SNAB data root must be either struct or array.");
                 default:
                     throw new EndOfStreamException("Unexpected end of stream while reading SNAB data.");
@@ -46,14 +52,14 @@ namespace CFS.SnabNet
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing && (!_leaveOpen || BaseStream is ZLibStream))
                 {
                     BaseStream.Dispose();
                 }
 
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 

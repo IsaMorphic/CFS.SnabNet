@@ -1,5 +1,6 @@
 ﻿using CFS.SnabNet;
 using CFS.SnabNet.ConsoleTest;
+using System.Dynamic;
 //using Microsoft.Extensions.FileSystemGlobbing;
 
 //if (args.Length > 0)
@@ -31,17 +32,14 @@ using CFS.SnabNet.ConsoleTest;
 //    return -1;
 //}
 
-using (SnabWriter writer = new(File.Create("test.snab"), SnabFlags.None)) 
-{
-    writer.Serialize(new TestStruct(3, [3, 4, 5]));
-}
+SnabInstance instance = new();
 
-dynamic parsedData;
-using (SnabReader reader = new(File.OpenRead("test.snab"))) 
-{
-    parsedData = reader.Deserialize();
-}
+dynamic inputData = new ExpandoObject();
+inputData.int_field = 3;
+inputData.array_field = new int[] { 3, 4, 5 };
+inputData.struct_field = new TestStruct(10, [7, 8, 9]);
 
-Console.WriteLine(parsedData.int_field);
-Console.WriteLine($"[{string.Join(", ", parsedData.array_field)}]");
-Console.WriteLine(parsedData.undefined_field);
+using (SnabWriter writer = instance.CreateWriter(File.Create("test.snab"), SnabFlags.None)) 
+{
+    writer.Serialize(inputData);
+}

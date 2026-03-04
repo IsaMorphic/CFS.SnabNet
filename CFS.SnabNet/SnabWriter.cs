@@ -5,6 +5,8 @@ namespace CFS.SnabNet
 {
     public class SnabWriter : IDisposable
     {
+        private readonly SnabInstance _instance;
+
         private readonly Stream _stream;
         private readonly bool _leaveOpen;
 
@@ -17,16 +19,18 @@ namespace CFS.SnabNet
 
         public Stream BaseStream { get; }
 
-        public SnabWriter(Stream stream, SnabFlags flags, bool leaveOpen = false)
+        internal SnabWriter(SnabInstance instance, Stream stream, SnabFlags flags, bool leaveOpen)
         {
-            _leaveOpen = leaveOpen;
+            _instance = instance;
+
             _stream = stream;
+            _leaveOpen = leaveOpen;
 
             Info = new SnabHeader()
             {
-                MajorVersion = SnabLibrary.MAJOR_VERSION,
-                MinorVersion = SnabLibrary.MINOR_VERSION,
-                LangId = SnabLibrary.LANG_ID,
+                MajorVersion = SnabInstance.MAJOR_VERSION,
+                MinorVersion = SnabInstance.MINOR_VERSION,
+                LangId = SnabInstance.LANG_ID,
                 Flags = flags,
             };
 
@@ -41,6 +45,10 @@ namespace CFS.SnabNet
             }
         }
 
+        internal byte GetTypeIdByValue(object? value) => _instance.GetTypeIdByValue(value);
+
+        internal ISnabType GetTypeById(byte typeId) => _instance.GetTypeById(typeId);
+
         public void Serialize(object obj)
         {
             if (_isCompleted) 
@@ -48,13 +56,13 @@ namespace CFS.SnabNet
                 throw new InvalidOperationException("Cannot serialize after completion.");
             }
 
-            byte typeId = SnabLibrary.GetTypeIdByValue(obj);
+            byte typeId = GetTypeIdByValue(obj);
             switch (typeId)
             {
-                case 0x01:
-                case 0x02:
+                case SnabType.Struct:
+                case SnabType.Array:
                     BaseStream.WriteByte(typeId);
-                    ISnabType type = SnabLibrary.GetTypeById(typeId);
+                    ISnabType type = GetTypeById(typeId);
                     type.WriteToInstance(this, typeId, obj);
                     break;
                 default:

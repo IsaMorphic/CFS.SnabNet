@@ -21,12 +21,14 @@ namespace CFS.SnabNet.Types
             using (BinaryReader reader = new(instance.BaseStream, Encoding.UTF8, true))
             {
                 byte elemTypeId = reader.ReadByte();
-                while (elemTypeId != 0x00)
+                while (elemTypeId != SnabType.None)
                 {
-                    if (!instance.Info.Flags.HasFlag(SnabFlags.User) && elemTypeId > SnabType.LastReserved)
+                    if (!instance.Info.Flags.HasFlag(SnabFlags.User) &&
+                        !instance.Info.Flags.HasFlag(SnabFlags.Extended) &&
+                        elemTypeId > SnabType.LastReserved)
                         throw new ArgumentException($"Cannot deserialize user-defined typeId {elemTypeId}; instance does not allow it.", nameof(instance));
 
-                    ISnabType elemType = SnabLibrary.GetTypeById(elemTypeId);
+                    ISnabType elemType = instance.GetTypeById(elemTypeId);
                     object? element = elemType.ReadFromInstance(instance, elemTypeId);
 
                     arrayData.Add(element);
@@ -45,15 +47,17 @@ namespace CFS.SnabNet.Types
             foreach (var element in (obj as IEnumerable) ?? 
                 throw new ArgumentException($"Object of type '{obj?.GetType().FullName ?? "null"}' cannot be serialized as SnabArray.", nameof(obj)))
             {
-                byte elemTypeId = SnabLibrary.GetTypeIdByValue(element);
-                if (!instance.Info.Flags.HasFlag(SnabFlags.User) && elemTypeId > SnabType.LastReserved)
+                byte elemTypeId = instance.GetTypeIdByValue(element);
+                if (!instance.Info.Flags.HasFlag(SnabFlags.User) &&
+                    !instance.Info.Flags.HasFlag(SnabFlags.Extended) &&
+                    elemTypeId > SnabType.LastReserved)
                     throw new ArgumentException($"Cannot serialize user-defined typeId {elemTypeId}; instance does not allow it.", nameof(instance));
-                instance.BaseStream.WriteByte(elemTypeId);
 
-                ISnabType elemType = SnabLibrary.GetTypeById(elemTypeId);
+                ISnabType elemType = instance.GetTypeById(elemTypeId);
+                instance.BaseStream.WriteByte(elemTypeId);
                 elemType.WriteToInstance(instance, elemTypeId, element);
             }
-            instance.BaseStream.WriteByte(0x00);
+            instance.BaseStream.WriteByte(SnabType.None);
         }
     }
 }
