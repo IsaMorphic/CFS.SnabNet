@@ -2,6 +2,8 @@
 {
     public class SnabHeader
     {
+        public const int HEADER_SIZE = 16;
+
         public byte MajorVersion { get; internal set; }
 
         public byte MinorVersion { get; internal set; }
