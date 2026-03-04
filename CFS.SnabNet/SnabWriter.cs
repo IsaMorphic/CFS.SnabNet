@@ -15,7 +15,7 @@ namespace CFS.SnabNet
 
         private bool _disposedValue;
 
-        public SnabHeader Info { get; }
+        internal SnabHeader Info { get; }
 
         public Stream BaseStream { get; }
 
@@ -39,7 +39,7 @@ namespace CFS.SnabNet
             {
                 BaseStream = new ZLibStream(_buffer, CompressionMode.Compress, false);
             }
-            else 
+            else
             {
                 BaseStream = _buffer;
             }
@@ -51,7 +51,7 @@ namespace CFS.SnabNet
 
         public void Serialize(object obj)
         {
-            if (_isCompleted) 
+            if (_isCompleted)
             {
                 throw new InvalidOperationException("Cannot serialize after completion.");
             }
@@ -92,12 +92,9 @@ namespace CFS.SnabNet
         {
             if (!_disposedValue)
             {
-                if (disposing)
+                if (disposing && !_leaveOpen)
                 {
-                    if (!_leaveOpen)
-                    {
-                        _stream.Dispose();
-                    }
+                    _stream.Dispose();
                 }
 
                 _disposedValue = true;
