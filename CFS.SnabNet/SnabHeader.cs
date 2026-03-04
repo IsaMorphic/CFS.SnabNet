@@ -1,6 +1,6 @@
 ﻿namespace CFS.SnabNet
 {
-    public class SnabHeader
+    internal class SnabHeader
     {
         public const int HEADER_SIZE = 16;
 
