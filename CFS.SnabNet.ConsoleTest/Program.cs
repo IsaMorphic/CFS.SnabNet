@@ -1,7 +1,7 @@
 ﻿using CFS.SnabNet;
 using Microsoft.Extensions.FileSystemGlobbing;
-using Newtonsoft.Json;
 
+SnabInstance instance = new();
 if (args.Length > 0)
 {
     Matcher inputFileGlob = new();
@@ -9,23 +9,18 @@ if (args.Length > 0)
     foreach (string inputFilePath in inputFileGlob.GetResultsInFullPath(Environment.CurrentDirectory))
     {
         Console.WriteLine("Parsing SNAB file: " + Path.GetFileName(inputFilePath));
-        string outputFilePath = Path.ChangeExtension(inputFilePath, ".json");
+        string outputFilePath = Path.ChangeExtension(inputFilePath, ".out");
 
-        object? parsedData;
-        using (SnabReader reader = new(File.OpenRead(inputFilePath)))
+        object parsedData;
+        using (SnabReader reader = instance.CreateReader(File.OpenRead(inputFilePath)))
         {
             parsedData = reader.Deserialize();
         }
 
-        Console.WriteLine("Serializing to JSON file: " + Path.GetFileName(outputFilePath));
-        JsonSerializer serializer = JsonSerializer.Create();
-        using (StreamWriter streamWriter = new(outputFilePath))
-        using (JsonTextWriter jsonWriter = new(streamWriter)
+        Console.WriteLine("Serializing to SNAB file: " + Path.GetFileName(outputFilePath));
+        using (SnabWriter writer = instance.CreateWriter(File.Create(outputFilePath), SnabFlags.None))
         {
-            Formatting = Formatting.Indented,
-        })
-        {
-            serializer.Serialize(jsonWriter, parsedData);
+            writer.Serialize(parsedData);
         }
     }
     return 0;

@@ -9,27 +9,27 @@ namespace CFS.SnabNet.Types
 
         public SnabString()
         {
-            TypeIds = new HashSet<byte> { 0x03, 0x04 };
+            TypeIds = new HashSet<byte> { SnabType.String, SnabType.StringW };
         }
 
         public string ReadFromInstance(SnabReader instance, byte typeId)
         {
-            bool isBigEndian = instance.Header.Flags.HasFlag(SnabFlags.BigEndian);
+            bool isBigEndian = instance.Info.Flags.HasFlag(SnabFlags.BigEndian);
 
             Encoding encoding;
             switch((typeId, isBigEndian)) 
             { 
-                case (0x03, _): 
+                case (SnabType.String, _): 
                     encoding = Encoding.UTF8;
                     break;
-                case (0x04, false): 
+                case (SnabType.StringW, false): 
                     encoding = Encoding.Unicode;
                     break;
-                case (0x04, true): 
+                case (SnabType.StringW, true): 
                     encoding = Encoding.BigEndianUnicode;
                     break;
                 default:
-                    throw new InvalidDataException($"Invalid typeId {typeId} for SnabString");
+                    throw new ArgumentException($"Invalid typeId {typeId} for SnabString", nameof(typeId));
             }
 
             using (BinaryReader reader = new(instance.BaseStream, encoding, true))
@@ -44,6 +44,41 @@ namespace CFS.SnabNet.Types
                 }
 
                 return new(strBuf.ToArray());
+            }
+        }
+
+        public void WriteToInstance(SnabWriter instance, byte typeId, object? obj)
+        {
+            bool isBigEndian = instance.Info.Flags.HasFlag(SnabFlags.BigEndian);
+
+            Encoding encoding;
+            switch ((typeId, isBigEndian))
+            {
+                case (SnabType.String, _):
+                    encoding = Encoding.UTF8;
+                    break;
+                case (SnabType.StringW, false):
+                    encoding = Encoding.Unicode;
+                    break;
+                case (SnabType.StringW, true):
+                    encoding = Encoding.BigEndianUnicode;
+                    break;
+                default:
+                    throw new ArgumentException($"Invalid typeId {typeId} for SnabString", nameof(typeId));
+            }
+
+            using (BinaryWriter writer = new(instance.BaseStream, encoding, true))
+            {
+                switch (obj)
+                {
+                    case char c:
+                        writer.Write(c);
+                        break;
+                    case string s:
+                        writer.Write(s.ToCharArray());
+                        break;
+                }
+                writer.Write('\x00');
             }
         }
     }

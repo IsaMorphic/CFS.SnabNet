@@ -5,6 +5,10 @@
         HashSet<byte> TypeIds { get; }
 
         object? ReadFromInstance(SnabReader instance, byte typeId);
+
+        void WriteToInstance(SnabWriter instance, byte typeId, object? obj);
+
+        byte GetTypeIdForValue(object? value) => 0x00;
     }
 
     public interface ISnabType<T> : ISnabType
