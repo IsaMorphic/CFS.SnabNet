@@ -3,7 +3,7 @@
 namespace CFS.SnabNet.Tests.Structs
 {
     [SnabStruct]
-    public partial class TestStruct
+    internal partial class TestStruct
     {
         [SnabField("int_field")]
         public int IntField { get; set; }
