@@ -9,6 +9,8 @@ namespace CFS.SnabNet.SourceGenerators
 
         public new byte TypeId { get; }
 
+        public SnabFieldAttribute() { }
+
         public SnabFieldAttribute(string name) 
         {
             Name = name;
