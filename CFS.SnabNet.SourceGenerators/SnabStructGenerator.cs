@@ -46,11 +46,12 @@ namespace CFS.SnabNet.SourceGenerators
             {
                 AttributeSyntax attribute = propDef.AttributeLists
                     .SelectMany(l => l.Attributes)
-                    .Single(a => a.Name.ToString() == "SnabField");
-                string propName = attribute.ArgumentList.Arguments[0]
-                    .Expression.ToString().Trim('"');
-                string typeIdStr = attribute.ArgumentList.Arguments.Count > 1 ?
-                    attribute.ArgumentList.Arguments[1].Expression.ToString() : "0x00";
+                    .SingleOrDefault(a => a.Name.ToString() == "SnabField");
+                string propName = attribute?.ArgumentList?.Arguments.Count > 0 ?
+                    attribute.ArgumentList?.Arguments[0]
+                    .Expression.ToString().Trim('"') : propDef.Identifier.ToString();
+                string typeIdStr = attribute?.ArgumentList?.Arguments.Count > 1 ?
+                    attribute.ArgumentList?.Arguments[1].Expression.ToString() : "0x00";
 
                 methodDef = methodDef.AddBodyStatements(
                     ParseStatement(
@@ -66,13 +67,13 @@ namespace CFS.SnabNet.SourceGenerators
             {
                 case ClassDeclarationSyntax _:
                     newTypeDef = ClassDeclaration(oldTypeDef.Identifier)
-                        .AddModifiers(ParseToken("public"), ParseToken("partial"))
+                        .AddModifiers(ParseToken("partial"))
                         .AddBaseListTypes(SimpleBaseType(ParseTypeName("ISnabStruct")))
                         .AddMembers(methodDef);
                     break;
                 case StructDeclarationSyntax _:
                     newTypeDef = StructDeclaration(oldTypeDef.Identifier)
-                        .AddModifiers(ParseToken("public"), ParseToken("partial"))
+                        .AddModifiers(ParseToken("partial"))
                         .AddBaseListTypes(SimpleBaseType(ParseTypeName("ISnabStruct")))
                         .AddMembers(methodDef);
                     break;
@@ -82,6 +83,11 @@ namespace CFS.SnabNet.SourceGenerators
 
             return CompilationUnit()
                 .AddUsings(UsingDirective(ParseName("CFS.SnabNet")))
+                .AddUsings(oldTypeDef.SyntaxTree
+                .GetRoot().ChildNodes()
+                .Where(x => x is UsingDirectiveSyntax)
+                .Cast<UsingDirectiveSyntax>()
+                .ToArray())
                 .AddMembers(
                     NamespaceDeclaration(
                     ((NamespaceDeclarationSyntax)oldTypeDef.Parent).Name
