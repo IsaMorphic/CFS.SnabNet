@@ -26,15 +26,15 @@ namespace CFS.SnabNet
 
         public SnabInstance()
         {
-            RegisterType<SnabStruct>();
-            RegisterType<SnabArray>();
-            RegisterType<SnabString>();
-            RegisterType<SnabReal>();
-            RegisterType<SnabInteger>();
-            RegisterType<SnabBoolean>();
-            RegisterType<SnabUndefined>();
-            RegisterType<SnabNull>();
-            RegisterType<SnabBuffer>();
+            RegisterType<SnabStruct>(isDefaultType: true);
+            RegisterType<SnabArray>(isDefaultType: true);
+            RegisterType<SnabString>(isDefaultType: true);
+            RegisterType<SnabReal>(isDefaultType: true);
+            RegisterType<SnabInteger>(isDefaultType: true);
+            RegisterType<SnabBoolean>(isDefaultType: true);
+            RegisterType<SnabUndefined>(isDefaultType: true);
+            RegisterType<SnabNull>(isDefaultType: true);
+            RegisterType<SnabBuffer>(isDefaultType: true);
         }
 
         internal ISnabType GetTypeById(byte typeId)
@@ -112,17 +112,20 @@ namespace CFS.SnabNet
             }
         }
 
-        public void RegisterType<T>()
+        internal void RegisterType<T>(bool isDefaultType)
             where T : ISnabType, new()
         {
             T type = new();
-
             IEnumerable<byte> conflictIds = _typeMap.Keys.Where(type.TypeIds.Contains);
-            if (conflictIds.Any())
+            if (!isDefaultType && type.TypeIds.Any(id => id <= SnabType.LastReserved))
+            {
+                throw new ArgumentException($"Custom types cannot use reserved typeIds (0-{SnabType.LastReserved})", nameof(T));
+            }
+            else if (conflictIds.Any())
             {
                 throw new ArgumentException($"Instance already contains a mapping for typeIds: {string.Join(", ", conflictIds)}", nameof(T));
             }
-            else
+            else 
             {
                 foreach (byte typeId in type.TypeIds)
                 {
@@ -131,14 +134,20 @@ namespace CFS.SnabNet
             }
         }
 
+        public void RegisterType<T>()
+            where T : ISnabType, new()
+        {
+            RegisterType<T>(isDefaultType: false);
+        }
+
         public SnabReader CreateReader(Stream stream, bool leaveOpen = false)
         {
-            return new SnabReader(this, stream, leaveOpen);
+            return new SnabReader(this, null, stream, leaveOpen);
         }
 
         public SnabWriter CreateWriter(Stream stream, SnabFlags flags, bool leaveOpen = false)
         {
-            return new SnabWriter(this, stream, flags, leaveOpen);
+            return new SnabWriter(this, null, stream, flags, leaveOpen);
         }
     }
 }

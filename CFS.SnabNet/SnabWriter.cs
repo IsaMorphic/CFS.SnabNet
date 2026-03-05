@@ -19,7 +19,7 @@ namespace CFS.SnabNet
 
         public Stream BaseStream { get; }
 
-        internal SnabWriter(SnabInstance instance, Stream stream, SnabFlags flags, bool leaveOpen)
+        internal SnabWriter(SnabInstance instance, MemoryStream? buffer, Stream stream, SnabFlags flags, bool leaveOpen)
         {
             _instance = instance;
 
@@ -34,7 +34,7 @@ namespace CFS.SnabNet
                 Flags = flags,
             };
 
-            _buffer = new MemoryStream();
+            _buffer = buffer ?? new MemoryStream();
             if (flags.HasFlag(SnabFlags.Compressed))
             {
                 BaseStream = new ZLibStream(_buffer, CompressionMode.Compress, false);
