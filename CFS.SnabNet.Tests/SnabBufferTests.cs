@@ -24,7 +24,7 @@ namespace CFS.SnabNet.Tests
             byte[] lengthBytes = BitConverter.GetBytes((uint)expectedData.Length);
             if (BitConverter.IsLittleEndian == isBigEndian) 
             {
-                lengthBytes.AsSpan().Reverse();
+                Array.Reverse(lengthBytes);
             }
 
             byte[] actualData;
@@ -54,7 +54,7 @@ namespace CFS.SnabNet.Tests
             byte[] lengthBytes = BitConverter.GetBytes((uint)bufferData.Length);
             if (BitConverter.IsLittleEndian == isBigEndian)
             {
-                lengthBytes.AsSpan().Reverse();
+                Array.Reverse(lengthBytes);
             }
 
             byte[] actualData, expectedData = [..lengthBytes, ..bufferData];
