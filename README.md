@@ -106,14 +106,29 @@ using CFS.SnabNet.SourceGeneration;
 [SnabStruct]
 public class TestStruct 
 {
-    /* Declare property for serialization (parameters optional) */
+    /* Declare property for serialization 
+    (parameters optional, but recommended) */
     [SnabField("int_field", SnabType.Integer)]
     public int IntField { get; set; }
     
     /* ... */
 }
 
-/* Later, pass any TestStruct instance to SnabWriter.Serialize (e.g. above) */
+/* Later, to use... */
+SnabInstance instance = new();
+
+/* For serialization */
+using(SnabWriter writer = instance.CreateWriter(/* ... */))
+{
+    writer.Serialize(new TestStruct { /* ... */ });
+}
+
+/* For deserialization */
+TestStruct parsedData;
+using (SnabReader reader = instance.CreateReader(/* ... */))
+{
+    parsedData = reader.Deserialize<TestStruct>();
+}
 ```
 
 # Development Guide
