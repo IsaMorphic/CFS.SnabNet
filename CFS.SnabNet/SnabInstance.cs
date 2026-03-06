@@ -10,10 +10,17 @@ namespace CFS.SnabNet
         public const byte MINOR_VERSION = 0;
 
         private const string _LANG_ID = "CS\x00\x00";
-        public static readonly uint LANG_ID =
-            BitConverter.ToUInt32(
-                Encoding.ASCII.GetBytes(_LANG_ID)
-                );
+        public static readonly uint LANG_ID;
+
+        static SnabInstance() 
+        {
+            Span<byte> langIdSpan = Encoding.ASCII.GetBytes(_LANG_ID);
+            if (!BitConverter.IsLittleEndian) 
+            {
+                langIdSpan.Reverse();
+            }
+            LANG_ID = BitConverter.ToUInt32(langIdSpan);
+        }
 
         private readonly SortedDictionary<byte, ISnabType> _typeMap = new();
 
