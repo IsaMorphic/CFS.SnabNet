@@ -70,6 +70,12 @@ namespace CFS.SnabNet
             return value;
         }
 
+        public T Deserialize<T>() 
+            where T : ISnabStruct<T>, new()
+        {
+            return T.Hydrate((IDictionary<string, object?>)Deserialize());
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposedValue)

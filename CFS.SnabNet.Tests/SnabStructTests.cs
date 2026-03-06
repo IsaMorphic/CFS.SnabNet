@@ -28,9 +28,9 @@ namespace CFS.SnabNet.Tests
         }
 
         [Fact]
-        public void ShouldResolveTypeCorrectly_TestStruct()
+        public void ShouldResolveTypeCorrectly_Struct()
         {
-            ShouldResolveTypeCorrectly<TestStruct>();
+            ShouldResolveTypeCorrectly<TestStruct1>();
         }
 
         [Fact]
@@ -120,18 +120,22 @@ namespace CFS.SnabNet.Tests
         }
 
         [Fact]
-        public void RoundtripIsCorrect_TestStruct()
+        public void RoundtripIsCorrect_Struct()
         {
-            TestStruct expectedObj = new TestStruct()
+            TestStruct1 expectedObj = new TestStruct1()
             {
                 IntField = 42,
                 RealField = 3.1415f,
-                ArrayField = [ 1, 2, 3 ],
+                StructField = new TestStruct2()
+                {
+                    StringField = "Hello world!",
+                    ArrayField = [1, 2, 3],
+                }
             };
 
             SnabInstance instance = new();
 
-            dynamic actualObj;
+            TestStruct1 actualObj;
             using (MemoryStream ms = new())
             {
                 using (SnabWriter writer = instance.CreateWriter(ms, SnabFlags.None, true))
@@ -142,13 +146,15 @@ namespace CFS.SnabNet.Tests
                 ms.Position = 0;
                 using (SnabReader reader = instance.CreateReader(ms, true))
                 {
-                    actualObj = reader.Deserialize();
+                    actualObj = reader.Deserialize<TestStruct1>();
                 }
             }
 
-            Assert.Equal((long)expectedObj.IntField, actualObj.int_field);
-            Assert.Equal((double)expectedObj.RealField, actualObj.real_field);
-            Assert.Equal(expectedObj.ArrayField!.Select(n => (long)n), (IEnumerable)actualObj.array_field);
+            Assert.NotNull(actualObj.StructField);
+            Assert.Equal(expectedObj.IntField, actualObj.IntField);
+            Assert.Equal(expectedObj.RealField, actualObj.RealField);
+            Assert.Equal(expectedObj.StructField.StringField, actualObj.StructField.StringField);
+            Assert.Equal(expectedObj.StructField.ArrayField, actualObj.StructField.ArrayField);
         }
     }
 }

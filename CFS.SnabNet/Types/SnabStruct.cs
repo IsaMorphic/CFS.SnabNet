@@ -53,7 +53,7 @@ namespace CFS.SnabNet.Types
             if (typeId != SnabType.Struct)
                 throw new ArgumentException($"Invalid typeId {typeId} for SnabStruct", nameof(typeId));
 
-            object? dict = (obj as ISnabStruct)?.Create() ?? obj;
+            object? dict = (obj as ISnabStruct)?.Dehydrate() ?? obj;
             switch (dict) 
             {
                 case IDictionary<string, object?>:
