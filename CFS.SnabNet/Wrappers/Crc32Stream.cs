@@ -61,6 +61,8 @@ namespace CFS.SnabNet.Wrappers
                 {
                     _innerStream.Dispose();
                 }
+
+                _disposedValue = true;
             }
         }
     }

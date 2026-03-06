@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="CFS.SnabNet.ConsoleTest/CFS.SnabNet.ConsoleTest.csproj" Id="aed7c7ab-da65-49d3-9639-b9ec229ad173" />
   <Project Path="CFS.SnabNet.SourceGenerators/CFS.SnabNet.SourceGenerators.csproj" Id="0a498240-f032-4eff-951d-bf0f5cf205cd" />
+  <Project Path="CFS.SnabNet.Tests/CFS.SnabNet.Tests.csproj" Id="beb109ac-d89f-4db7-9f8a-85caf77d182c" />
   <Project Path="CFS.SnabNet/CFS.SnabNet.csproj" />
 </Solution>

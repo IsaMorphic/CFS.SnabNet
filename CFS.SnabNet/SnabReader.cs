@@ -17,12 +17,12 @@ namespace CFS.SnabNet
 
         public Stream BaseStream { get; }
 
-        internal SnabReader(SnabInstance instance, Stream stream, bool leaveOpen)
+        internal SnabReader(SnabInstance instance, SnabHeader? header, Stream stream, bool leaveOpen)
         {
             _instance = instance;
             _leaveOpen = leaveOpen;
 
-            Info = SnabHeader.ReadFromStream(stream);
+            Info = header ?? SnabHeader.ReadFromStream(stream);
 
             _stream = new Crc32Stream(stream);
             if (Info.Flags.HasFlag(SnabFlags.Compressed))
