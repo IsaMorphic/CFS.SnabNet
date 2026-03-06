@@ -65,11 +65,12 @@ namespace CFS.SnabNet.SourceGenerators
             dehydrateMethodDef = dehydrateMethodDef.AddBodyStatements(ParseStatement("return structData;"));
 
             MethodDeclarationSyntax hydrateMethodDef = MethodDeclaration(
-                ParseTypeName(oldTypeDef.Identifier.ToString()), "Hydrate"
+                ParseTypeName($"{oldTypeDef.Identifier}?"), "Hydrate"
                 ).AddModifiers(ParseToken("public"), ParseToken("static")
                 ).AddParameterListParameters(Parameter(Identifier("structData"))
-                    .WithType(ParseTypeName("IDictionary<string, object?>"))
+                    .WithType(ParseTypeName("IDictionary<string, object?>?"))
                 ).AddBodyStatements(
+                    ParseStatement("if (structData is null) return null;"),
                     ParseStatement($"{oldTypeDef.Identifier} inst = new();")
                 );
             foreach (PropertyDeclarationSyntax propDef in oldTypeDef.ChildNodes()
@@ -92,14 +93,14 @@ namespace CFS.SnabNet.SourceGenerators
                 switch (typeIdStr)
                 {
                     case "SnabType.Struct":
-                        fallbackExpr = $"{propDef.Type.ToString().TrimEnd('?')}.Hydrate((IDictionary<string, object?>)structData[\"{propName}\"])";
+                        fallbackExpr = $"{propDef.Type.ToString().TrimEnd('?')}.Hydrate((IDictionary<string, object?>?)structData?[\"{propName}\"])";
                         break;
                     case "SnabType.Array":
                         string elemType = propDef.Type.ToString().TrimEnd('[', ']', '?');
                         fallbackExpr = $"({propDef.Type})" +
-                            $"[..((IList<object?>)structData[\"{propName}\"])" +
-                            $".Select(x => ((IConvertible)x).ToType(typeof({elemType}), null))" +
-                            $".Cast<{elemType}>()]";
+                            $"[..((IList<object?>?)structData?[\"{propName}\"])?" +
+                            $".Select(x => (x as IConvertible)?.ToType(typeof({elemType}), null))" +
+                            $".Cast<{elemType}>() ?? Enumerable.Empty<{elemType}>()]";
                         break;
                     default:
                         fallbackExpr = "default";
@@ -109,7 +110,7 @@ namespace CFS.SnabNet.SourceGenerators
                 string propType = propDef.Type.ToString().TrimEnd('?');
                 hydrateMethodDef = hydrateMethodDef.AddBodyStatements(ParseStatement(
                     $"inst.{propDef.Identifier} = ({propType}?)(" +
-                    $"structData[\"{propName}\"] as IConvertible)?.ToType(" +
+                    $"structData?[\"{propName}\"] as IConvertible)?.ToType(" +
                     $"typeof({propType}), null) ?? " +
                     $"{fallbackExpr};"
                     ));

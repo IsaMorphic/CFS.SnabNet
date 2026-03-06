@@ -1,4 +1,6 @@
-﻿namespace CFS.SnabNet
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace CFS.SnabNet
 {
     public interface ISnabStruct
     {
@@ -8,6 +10,7 @@
     public interface ISnabStruct<T> : ISnabStruct
         where T : ISnabStruct<T>, new()
     {
-        static abstract T Hydrate(IDictionary<string, object?> structData);
+        [return: NotNullIfNotNull(nameof(structData))]
+        static abstract T? Hydrate(IDictionary<string, object?>? structData);
     }
 }
