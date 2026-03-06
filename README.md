@@ -79,6 +79,7 @@ string strData = parsedData.string_field;
 ## `SnabWriter` (Serialization)
 
 ```csharp
+using System.Dynamic; /* for ExpandoObject */
 using CFS.SnabNet;
 
 /* Input data can be ExpandoObject or specific class instance (see next example) */
