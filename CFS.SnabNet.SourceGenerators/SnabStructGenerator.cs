@@ -83,11 +83,12 @@ namespace CFS.SnabNet.SourceGenerators
             }
 
             return CompilationUnit()
-                .AddUsings(UsingDirective(ParseName("CFS.SnabNet")))
                 .AddUsings(oldTypeDef.SyntaxTree
                 .GetRoot().ChildNodes()
-                .Where(x => x is UsingDirectiveSyntax)
+                .Where(x => x is UsingDirectiveSyntax ud && 
+                    ud.Name?.ToString() != "CFS.SnabNet")
                 .Cast<UsingDirectiveSyntax>()
+                .Prepend(UsingDirective(ParseName("CFS.SnabNet")))
                 .ToArray())
                 .AddMembers(
                     NamespaceDeclaration(
