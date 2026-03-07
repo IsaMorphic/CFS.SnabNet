@@ -69,6 +69,13 @@ namespace CFS.SnabNet.SourceGenerators
                 ).AddModifiers(ParseToken("public"), ParseToken("static")
                 ).AddParameterListParameters(Parameter(Identifier("structData"))
                     .WithType(ParseTypeName("IDictionary<string, object?>?"))
+                ).AddAttributeLists(
+                    AttributeList(SingletonSeparatedList(
+                        Attribute(ParseName("NotNullIfNotNull"))
+                        .AddArgumentListArguments(
+                            AttributeArgument(ParseExpression("nameof(structData)"))
+                            ))
+                    ).WithTarget(AttributeTargetSpecifier(ParseToken("return")))
                 ).AddBodyStatements(
                     ParseStatement("if (structData is null) return null;"),
                     ParseStatement($"{oldTypeDef.Identifier} inst = new();")
@@ -93,12 +100,12 @@ namespace CFS.SnabNet.SourceGenerators
                 switch (typeIdStr)
                 {
                     case "SnabType.Struct":
-                        fallbackExpr = $"{propDef.Type.ToString().TrimEnd('?')}.Hydrate((IDictionary<string, object?>?)structData[\"{propName}\"])";
+                        fallbackExpr = $"{propDef.Type.ToString().TrimEnd('?')}.Hydrate((IDictionary<string, object?>?){propName})";
                         break;
                     case "SnabType.Array":
                         string elemType = propDef.Type.ToString().TrimEnd('[', ']', '?');
-                        fallbackExpr = $"({propDef.Type})(structData[\"{propName}\"] is null ? " +
-                            $"null : [..((IList<object?>)structData[\"{propName}\"]!)" +
+                        fallbackExpr = $"({propDef.Type})({propName} is null ? " +
+                            $"null : [..((IList<object?>){propName})" +
                             $".Select(x => (x as IConvertible)?.ToType(typeof({elemType}), null))" +
                             $".Cast<{elemType}>()])";
                         break;
@@ -108,11 +115,11 @@ namespace CFS.SnabNet.SourceGenerators
                 }
 
                 string propType = propDef.Type.ToString().TrimEnd('?');
-                hydrateMethodDef = hydrateMethodDef.AddBodyStatements(ParseStatement(
-                    $"inst.{propDef.Identifier} = ({propType}?)(" +
-                    $"structData[\"{propName}\"] as IConvertible)?.ToType(" +
-                    $"typeof({propType}), null) ?? " +
-                    $"{fallbackExpr};"
+                hydrateMethodDef = hydrateMethodDef.AddBodyStatements(
+                    ParseStatement($"inst.{propDef.Identifier} = " +
+                    $"structData.TryGetValue(\"{propName}\", out object? {propName}) ? " +
+                    $"(({propType}?)({propName} as IConvertible)?.ToType(" +
+                    $"typeof({propType}), null) ?? {fallbackExpr}) : default;"
                     ));
             }
             hydrateMethodDef = hydrateMethodDef.AddBodyStatements(ParseStatement("return inst;"));
@@ -142,7 +149,8 @@ namespace CFS.SnabNet.SourceGenerators
 
             HashSet<string> requiredUsings = new HashSet<string>()
             {
-                "CFS.SnabNet"
+                "System.Diagnostics.CodeAnalysis",
+                "CFS.SnabNet",
             };
             return CompilationUnit()
                 .AddUsings(requiredUsings.Select(x => UsingDirective(ParseName(x))).ToArray())
