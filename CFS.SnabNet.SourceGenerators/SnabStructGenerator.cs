@@ -116,11 +116,11 @@ namespace CFS.SnabNet.SourceGenerators
 
                 string propType = propDef.Type.ToString().TrimEnd('?');
                 hydrateMethodDef = hydrateMethodDef.AddBodyStatements(
+                    IfStatement(ParseExpression($"structData.TryGetValue(\"{propName}\", out object? {propName})"),
                     ParseStatement($"inst.{propDef.Identifier} = " +
-                    $"structData.TryGetValue(\"{propName}\", out object? {propName}) ? " +
-                    $"(({propType}?)({propName} as IConvertible)?.ToType(" +
-                    $"typeof({propType}), null) ?? {fallbackExpr}) : default;"
-                    ));
+                    $"({propType}?)({propName} as IConvertible)?.ToType(" +
+                    $"typeof({propType}), null) ?? {fallbackExpr};"
+                    )));
             }
             hydrateMethodDef = hydrateMethodDef.AddBodyStatements(ParseStatement("return inst;"));
 
