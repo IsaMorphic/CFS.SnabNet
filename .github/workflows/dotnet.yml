@@ -22,6 +22,10 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ matrix.version }}.x
+        dotnet-version: 10.0.x
+    - name: Restore all dependencies
+      run: dotnet restore
+    - name: Build CFS.SnabNet.Tests
+      run: dotnet build ./CFS.SnabNet.Tests --no-restore --framework "net${{ matrix.version }}"
     - name: Run CFS.SnabNet.Tests
-      run: dotnet test --verbosity normal --framework "net${{ matrix.version }}" 
+      run: dotnet test --no-build --verbosity normal --framework "net${{ matrix.version }}" 
