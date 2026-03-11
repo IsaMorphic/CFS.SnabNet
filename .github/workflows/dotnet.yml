@@ -22,6 +22,6 @@ jobs:
     - name: Restore all dependencies
       run: dotnet restore
     - name: Build CFS.SnabNet.Tests
-      run: dotnet build ./CFS.SnabNet.Tests --no-restore
-    - name: Run CFS.SnabNet.Tests
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet build ./CFS.SnabNet.Tests --no-restore --framework net10.0
+    - name: Test CFS.SnabNet
+      run: dotnet test --no-build --verbosity normal --framework net10.0
