@@ -7,7 +7,7 @@
 	</PropertyGroup>
 	
 	<PropertyGroup>
-		<PackageId>CFS.SnabNet</PackageId>
+		<PackageId>ChosenFewSoftware.SnabNet</PackageId>
 		<Version>0.1.0</Version>
 		<Authors>Isabelle Santin</Authors>
 		<Company>Chosen Few Software</Company>
