@@ -23,7 +23,5 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ matrix.version }}.x
-    - name: Build CFS.SnabNet.Tests
-      run: dotnet build ./CFS.SnabNet.Tests/CFS.SnabNet.Tests.csproj --framework "net${{ matrix.version }}"
     - name: Run CFS.SnabNet.Tests
-      run: dotnet test --no-build --verbosity normal --framework "net${{ matrix.version }}" 
+      run: dotnet test --verbosity normal --framework "net${{ matrix.version }}" 
