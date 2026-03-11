@@ -30,4 +30,4 @@ jobs:
       - name: Create NuGet packages
         run: dotnet pack --no-build --output build/
       - name: Publish to NuGet
-        run: dotnet nuget push --api-key ${{ secrets.GITHUB_TOKEN }} --source nuget.org build/**/*.nupkg
+        run: dotnet nuget push --api-key ${{ secrets.API_KEY }} --source nuget.org build/**/*.nupkg
