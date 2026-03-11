@@ -8,7 +8,7 @@
 
 	<PropertyGroup>
 		<PackageId>ChosenFewSoftware.SnabNet.SourceGenerators</PackageId>
-		<Version>0.1.0</Version>
+		<Version>0.1.1</Version>
 		<Authors>Isabelle Santin</Authors>
 		<Company>Chosen Few Software</Company>
 		<PackageTags>serialization;binary format;deserialization;bson;binary json</PackageTags>
