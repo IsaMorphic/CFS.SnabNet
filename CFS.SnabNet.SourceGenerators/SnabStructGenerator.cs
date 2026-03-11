@@ -17,7 +17,7 @@ namespace CFS.SnabNet.SourceGenerators
         {
             IncrementalValuesProvider<TypeDeclarationSyntax> typeDefs = initContext.SyntaxProvider
                 .ForAttributeWithMetadataName(
-                "CFS.SnabNet.SourceGenerators.SnabStructAttribute",
+                "CFS.SnabNet.SnabStructAttribute",
                 (t, ct) => t is ClassDeclarationSyntax || t is StructDeclarationSyntax,
                 (ctx, ct) => ctx.TargetNode as TypeDeclarationSyntax
                 );
