@@ -30,4 +30,4 @@ jobs:
     - name: Build CFS.SnabNet
       run: dotnet build ./CFS.SnabNet/CFS.SnabNet.csproj --no-restore --framework "net${{ matrix.version }}"
     - name: Test CFS.SnabNet
-      run: dotnet test ./CFS.SnabNet.Tests/CFS.SnabNet.Tests.csproj --no-build --verbosity normal --framework "net${{ matrix.version }}" 
+      run: dotnet test --no-build --verbosity normal --framework "net${{ matrix.version }}" 
