@@ -1,6 +1,4 @@
-﻿using CFS.SnabNet.SourceGenerators;
-
-namespace CFS.SnabNet.Tests.Structs
+﻿namespace CFS.SnabNet.Tests.Structs
 {
     [SnabStruct]
     internal partial class TestStruct1

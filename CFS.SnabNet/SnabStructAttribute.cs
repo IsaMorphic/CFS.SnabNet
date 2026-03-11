@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CFS.SnabNet.SourceGenerators
+﻿namespace CFS.SnabNet
 {
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
