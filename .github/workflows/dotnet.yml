@@ -24,7 +24,7 @@ jobs:
       with:
         dotnet-version: "${{ matrix.version }}.x"
     - name: Restore dependencies
-      run: dotnet restore --framework "net${{ matrix.version }}"
+      run: dotnet restore"
     - name: Build
       run: dotnet build --no-restore --framework "net${{ matrix.version }}"
     - name: Test
