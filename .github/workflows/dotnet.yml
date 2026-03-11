@@ -13,10 +13,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     
-    strategy:
-      matrix:
-        version: ["8.0", "9.0", "10.0"]
-
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
@@ -26,6 +22,6 @@ jobs:
     - name: Restore all dependencies
       run: dotnet restore
     - name: Build CFS.SnabNet.Tests
-      run: dotnet build ./CFS.SnabNet.Tests --no-restore --framework "net${{ matrix.version }}"
+      run: dotnet build ./CFS.SnabNet.Tests --no-restore
     - name: Run CFS.SnabNet.Tests
-      run: dotnet test --no-build --verbosity normal --framework "net${{ matrix.version }}" 
+      run: dotnet test --no-build --verbosity normal
