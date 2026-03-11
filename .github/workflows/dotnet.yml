@@ -23,13 +23,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ matrix.version }}.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build CFS.SnabNet.SourceGenerators
-      run: dotnet build ./CFS.SnabNet.SourceGenerators/CFS.SnabNet.SourceGenerators.csproj --no-restore
-    - name: Build CFS.SnabNet
-      run: dotnet build ./CFS.SnabNet/CFS.SnabNet.csproj --no-restore --framework "net${{ matrix.version }}"
     - name: Build CFS.SnabNet.Tests
-      run: dotnet build ./CFS.SnabNet.Tests/CFS.SnabNet.Tests.csproj --no-restore --framework "net${{ matrix.version }}"
-    - name: Run all tests
+      run: dotnet build ./CFS.SnabNet.Tests/CFS.SnabNet.Tests.csproj --framework "net${{ matrix.version }}"
+    - name: Run CFS.SnabNet.Tests
       run: dotnet test --no-build --verbosity normal --framework "net${{ matrix.version }}" 
