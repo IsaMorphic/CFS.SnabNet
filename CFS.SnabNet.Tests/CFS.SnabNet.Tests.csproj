@@ -24,7 +24,7 @@
 		<ProjectReference Include="..\CFS.SnabNet\CFS.SnabNet.csproj" />
 		<ProjectReference Include="..\CFS.SnabNet.SourceGenerators\CFS.SnabNet.SourceGenerators.csproj"
 						OutputItemType="Analyzer"
-						ReferenceOutputAssembly="true" />
+						ReferenceOutputAssembly="False" />
 	</ItemGroup>
 
 	<ItemGroup>
