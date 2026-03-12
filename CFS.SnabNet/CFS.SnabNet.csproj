@@ -16,6 +16,8 @@
 			Chosen Few Software's custom .NET implementation for the SNAB stream format.
 		</Description>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/IsaMorphic/CFS.SnabNet</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 	
 	<ItemGroup>
