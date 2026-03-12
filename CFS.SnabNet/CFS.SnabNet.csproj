@@ -8,17 +8,25 @@
 	
 	<PropertyGroup>
 		<PackageId>ChosenFewSoftware.SnabNet</PackageId>
-		<Version>0.1.1</Version>
 		<Authors>Isabelle Santin</Authors>
 		<Company>Chosen Few Software</Company>
 		<PackageTags>serialization;binary format;deserialization;bson;binary json</PackageTags>
 		<Description>
-			Chosen Few Software's custom .NET implementation for the SNAB stream format
+			Chosen Few Software's custom .NET implementation for the SNAB stream format.
 		</Description>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 	
 	<ItemGroup>
+		<PackageReference Include="GitInfo" Version="3.6.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="System.IO.Hashing" Version="10.0.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 </Project>

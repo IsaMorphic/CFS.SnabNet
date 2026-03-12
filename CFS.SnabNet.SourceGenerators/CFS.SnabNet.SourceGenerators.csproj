@@ -8,21 +8,26 @@
 
 	<PropertyGroup>
 		<PackageId>ChosenFewSoftware.SnabNet.SourceGenerators</PackageId>
-		<Version>0.1.1</Version>
 		<Authors>Isabelle Santin</Authors>
 		<Company>Chosen Few Software</Company>
 		<PackageTags>serialization;binary format;deserialization;bson;binary json</PackageTags>
 		<Description>
 			Chosen Few Software's custom .NET implementation for the SNAB stream format. Include this package for source generation features.
 		</Description>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="GitInfo" Version="3.6.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
 	</ItemGroup>
 	
 	<ItemGroup>
+		<None Include="..\README.md" Pack="true" PackagePath="\" />
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
 	

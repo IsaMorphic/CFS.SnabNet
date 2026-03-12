@@ -5,7 +5,7 @@ name: NuGet
 
 on:
   push:
-    tags: ["*"]
+    branches: [ "main" ]
 
 jobs:
   publish:
