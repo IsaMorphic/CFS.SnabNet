@@ -3,7 +3,7 @@
     [AttributeUsage(AttributeTargets.Property)]
     public class SnabFieldAttribute : Attribute
     {
-        public string Name { get; }
+        public string? Name { get; }
 
         public new byte TypeId { get; }
 
