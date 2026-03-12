@@ -4,6 +4,7 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<EnforceExtendedAnalyzerRules>True</EnforceExtendedAnalyzerRules>
 		<Nullable>Disable</Nullable>
+		<MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -15,15 +16,17 @@
 			Chosen Few Software's custom .NET implementation for the SNAB stream format. Include this package for source generation features.
 		</Description>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/IsaMorphic/CFS.SnabNet</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="GitInfo" Version="3.6.0">
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
+		<PackageReference Include="MinVer" Version="7.0.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all" />
-		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
 	</ItemGroup>
 	
 	<ItemGroup>
