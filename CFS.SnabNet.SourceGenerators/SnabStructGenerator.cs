@@ -127,7 +127,7 @@ namespace CFS.SnabNet.SourceGenerators
                         fallbackExpr = $"({propDef.Type})({propName} is null ? " +
                             $"null : [..((IList<object?>){propName})" +
                             $".Select(x => (x as IConvertible)?.ToType(typeof({elemType}), null) ?? " +
-                            $"{(_sDefaultTypes.Contains(elemType) ? "x" : $"{elemType}.Hydrate(x)")})" +
+                            $"{(_sDefaultTypes.Contains(elemType) ? "x" : $"{elemType}.Hydrate(x as IDictionary<string, object?>)")})" +
                             $".Cast<{elemType}>()])";
                         break;
                     default:
