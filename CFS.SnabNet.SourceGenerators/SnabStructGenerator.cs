@@ -13,6 +13,23 @@ namespace CFS.SnabNet.SourceGenerators
     [Generator]
     public class SnabStructGenerator : IIncrementalGenerator
     {
+        private static readonly HashSet<string> _sDefaultTypes = new HashSet<string>()
+        {            
+            "byte", 
+            "sbyte", 
+            "ushort", 
+            "short", 
+            "uint", 
+            "int", 
+            "ulong", 
+            "long", 
+            "string", 
+            "char", 
+            "Half", 
+            "float", 
+            "double"
+        };
+
         public void Initialize(IncrementalGeneratorInitializationContext initContext)
         {
             IncrementalValuesProvider<TypeDeclarationSyntax> typeDefs = initContext.SyntaxProvider
@@ -106,7 +123,8 @@ namespace CFS.SnabNet.SourceGenerators
                         string elemType = propDef.Type.ToString().TrimEnd('[', ']', '?');
                         fallbackExpr = $"({propDef.Type})({propName} is null ? " +
                             $"null : [..((IList<object?>){propName})" +
-                            $".Select(x => (x as IConvertible)?.ToType(typeof({elemType}), null) ?? x)" +
+                            $".Select(x => (x as IConvertible)?.ToType(typeof({elemType}), null) ?? " +
+                            $"{(_sDefaultTypes.Contains(elemType) ? "x" : $"{elemType}.Hydrate(x)")})" +
                             $".Cast<{elemType}>()])";
                         break;
                     default:
