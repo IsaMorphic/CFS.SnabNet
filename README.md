@@ -109,9 +109,9 @@ using (SnabWriter writer = instance.CreateWriter(/* Stream to write data to */, 
 using CFS.SnabNet;
 using CFS.SnabNet.SourceGeneration;
 
-/* Mark this type for source generation */
+/* Mark this type for source generation, make sure to mark as "partial" */
 [SnabStruct]
-public class TestStruct 
+public partial class TestStruct 
 {
     /* Declare property for serialization 
     (parameters optional, but recommended) */
