@@ -14,19 +14,22 @@ namespace CFS.SnabNet.SourceGenerators
     public class SnabStructGenerator : IIncrementalGenerator
     {
         private static readonly HashSet<string> _sDefaultTypes = new HashSet<string>()
-        {            
-            "byte", 
-            "sbyte", 
-            "ushort", 
-            "short", 
-            "uint", 
-            "int", 
-            "ulong", 
-            "long", 
-            "string", 
-            "char", 
-            "Half", 
-            "float", 
+        {
+            "bool",
+            "byte",
+            "sbyte",
+            "ushort",
+            "short",
+            "uint",
+            "int",
+            "ulong",
+            "long",
+            "nuint",
+            "nint",
+            "string",
+            "char",
+            "Half",
+            "float",
             "double"
         };
 
