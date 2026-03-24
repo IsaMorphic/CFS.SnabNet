@@ -162,7 +162,9 @@ namespace CFS.SnabNet.SourceGenerators
                 .ToArray())
                 .AddMembers(
                     NamespaceDeclaration(
-                    ((NamespaceDeclarationSyntax)oldTypeDef.Parent).Name
+                    (oldTypeDef.Parent as NamespaceDeclarationSyntax)?.Name ??
+                    (oldTypeDef.Parent as FileScopedNamespaceDeclarationSyntax)?.Name ??
+                    throw new ArgumentException($"Namespace could not be found for user-defined type: \"{oldTypeDef.Identifier}\"")
                     ).AddMembers(newTypeDef))
                 .NormalizeWhitespace()
                 .GetText(Encoding.UTF8);
