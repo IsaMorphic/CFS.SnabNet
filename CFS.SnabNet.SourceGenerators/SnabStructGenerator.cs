@@ -45,7 +45,11 @@ namespace CFS.SnabNet.SourceGenerators
             // generate a class that contains their values as const strings
             initContext.RegisterSourceOutput(typeDefs, (spc, typeDef) =>
             {
-                string className = typeDef.Identifier.ValueText;
+                string className = string.Join(".", typeDef.AncestorsAndSelf()
+                    .Select(x => x as TypeDeclarationSyntax)
+                    .Where(x => x != null)
+                    .Select(x => x.Identifier.ValueText)
+                    .Reverse());
                 spc.AddSource(className, GenerateSourceOutput(typeDef));
             });
         }
@@ -145,7 +149,7 @@ namespace CFS.SnabNet.SourceGenerators
             }
             hydrateMethodDef = hydrateMethodDef.AddBodyStatements(ParseStatement("return inst;"));
 
-            BaseTypeDeclarationSyntax newTypeDef;
+            TypeDeclarationSyntax newTypeDef;
             switch (oldTypeDef)
             {
                 case ClassDeclarationSyntax _:
@@ -168,6 +172,24 @@ namespace CFS.SnabNet.SourceGenerators
                     throw new ArgumentException("Only classes and structs are supported", nameof(oldTypeDef));
             }
 
+            TypeDeclarationSyntax parent = oldTypeDef.Parent as TypeDeclarationSyntax;
+            while (parent != null)
+            {
+                newTypeDef = TypeDeclaration(parent.Kind(), parent.Identifier)
+                    .WithModifiers(TokenList(ParseToken("partial")))
+                    .WithMembers(SingletonList<MemberDeclarationSyntax>(newTypeDef));
+                parent = parent.Parent as TypeDeclarationSyntax;
+            }
+
+            BaseNamespaceDeclarationSyntax namespaceDef = oldTypeDef.Ancestors()
+                .FirstOrDefault(x => x is BaseNamespaceDeclarationSyntax) 
+                as BaseNamespaceDeclarationSyntax;
+            string className = string.Join(".", oldTypeDef.AncestorsAndSelf()
+                .Select(x => x as TypeDeclarationSyntax)
+                .Where(x => x != null)
+                .Select(x => x.Identifier.ValueText)
+                .Reverse());
+
             HashSet<string> requiredUsings = new HashSet<string>()
             {
                 "System.Diagnostics.CodeAnalysis",
@@ -182,10 +204,8 @@ namespace CFS.SnabNet.SourceGenerators
                 .Cast<UsingDirectiveSyntax>()
                 .ToArray())
                 .AddMembers(
-                    NamespaceDeclaration(
-                    (oldTypeDef.Parent as NamespaceDeclarationSyntax)?.Name ??
-                    (oldTypeDef.Parent as FileScopedNamespaceDeclarationSyntax)?.Name ??
-                    throw new ArgumentException($"Namespace could not be found for user-defined type: \"{oldTypeDef.Identifier}\"")
+                    NamespaceDeclaration(namespaceDef?.Name ??
+                    throw new ArgumentException($"Namespace could not be found for user-defined type: \"{className}\"")
                     ).AddMembers(newTypeDef))
                 .NormalizeWhitespace()
                 .GetText(Encoding.UTF8);
