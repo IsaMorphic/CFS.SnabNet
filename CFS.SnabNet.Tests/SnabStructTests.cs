@@ -130,6 +130,10 @@ namespace CFS.SnabNet.Tests
                 {
                     StringField = "Hello world!",
                     ArrayField = [1, 2, 3],
+                },
+                NestedStructField = new TestStruct1.NestedStruct()
+                {
+                    NestedStringField = "Nested Hello!",
                 }
             };
 
@@ -155,6 +159,7 @@ namespace CFS.SnabNet.Tests
             Assert.Equal(expectedObj.RealField, actualObj.RealField);
             Assert.Equal(expectedObj.StructField.StringField, actualObj.StructField.StringField);
             Assert.Equal(expectedObj.StructField.ArrayField, actualObj.StructField.ArrayField);
+            Assert.Equal(expectedObj.NestedStructField.NestedStringField, actualObj.NestedStructField.NestedStringField);
         }
     }
 }
