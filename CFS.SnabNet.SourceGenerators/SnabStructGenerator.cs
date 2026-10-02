@@ -198,10 +198,13 @@ namespace CFS.SnabNet.SourceGenerators
             return CompilationUnit()
                 .AddUsings(requiredUsings.Select(x => UsingDirective(ParseName(x))).ToArray())
                 .AddUsings(oldTypeDef.SyntaxTree
-                .GetRoot().ChildNodes()
+                .GetRoot().DescendantNodes()
                 .Where(x => x is UsingDirectiveSyntax ud &&
                     !requiredUsings.Contains(ud.Name?.ToString()))
                 .Cast<UsingDirectiveSyntax>()
+                .Select(ud => UsingDirective(ParseName(
+                    string.Join(".", [..(ud.Parent as BaseNamespaceDeclarationSyntax)?.Name.ToString().Split('.')[..^2], ud.Name.ToString()])
+                    )))
                 .ToArray())
                 .AddMembers(
                     NamespaceDeclaration(namespaceDef?.Name ??
