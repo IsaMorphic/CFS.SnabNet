@@ -202,9 +202,9 @@ namespace CFS.SnabNet.SourceGenerators
                 .Where(x => x is UsingDirectiveSyntax ud &&
                     !requiredUsings.Contains(ud.Name?.ToString()))
                 .Cast<UsingDirectiveSyntax>()
-                .Select(ud => UsingDirective(ParseName(
-                    string.Join(".", [..(ud.Parent as BaseNamespaceDeclarationSyntax)?.Name.ToString().Split('.')[..^2], ud.Name.ToString()])
-                    )))
+                .Select(ud => ((ud.Parent as BaseNamespaceDeclarationSyntax)?.Name.ToString(), ud.Name.ToString()))
+                .Select(x => x.Item1.Substring(0, x.Item1.IndexOf(x.Item2)) + x.Item2)
+                .Select(arr => UsingDirective(ParseName(string.Join(".", arr))))
                 .ToArray())
                 .AddMembers(
                     NamespaceDeclaration(namespaceDef?.Name ??
