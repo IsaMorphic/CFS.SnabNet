@@ -203,7 +203,7 @@ namespace CFS.SnabNet.SourceGenerators
                     !requiredUsings.Contains(ud.Name?.ToString()))
                 .Cast<UsingDirectiveSyntax>()
                 .Select(ud => ((ud.Parent as BaseNamespaceDeclarationSyntax)?.Name.ToString(), ud.Name.ToString()))
-                .Select(x => (s1: x.Item1, s2: x.Item2, index: x.Item1.IndexOf(x.Item2)))
+                .Select(x => (s1: x.Item1, s2: x.Item2, index: x.Item1.IndexOf(x.Item2.Split('.')[0])))
                 .Select(x => x.index < 0 ? $"{x.s1}.{x.s2}" : x.s1.Substring(0, x.index) + x.s2)
                 .Select(arr => UsingDirective(ParseName(string.Join(".", arr))))
                 .ToArray())
