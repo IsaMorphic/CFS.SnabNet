@@ -90,8 +90,7 @@ namespace CFS.SnabNet.Types
                             writer.Write(key.ToCharArray());
                             writer.Write('\x00');
 
-                            innerType.WriteToInstance(instance, innerTypeId, 
-                                (value as SnabField)?.Value ?? value);
+                            innerType.WriteToInstance(instance, innerTypeId, innerValue);
                         }
                         writer.Write(SnabType.None);
                     }
