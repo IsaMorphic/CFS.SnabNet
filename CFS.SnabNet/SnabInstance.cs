@@ -103,6 +103,9 @@ namespace CFS.SnabNet
                 case IEnumerable:
                     return SnabType.Array;
 
+                case SnabField field:
+                    return field.TypeId;
+
                 default:
                     return _typeMap
                         .SkipWhile(x => x.Key <= SnabType.LastReserved)
