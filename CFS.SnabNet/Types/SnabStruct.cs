@@ -64,12 +64,21 @@ namespace CFS.SnabNet.Types
                     {
                         foreach ((string key, object? value) in items)
                         {
-                            byte innerTypeId = value is SnabField field ? 
-                                field.TypeId : SnabType.None;
-                            innerTypeId = innerTypeId == SnabType.None ?
-                                instance.GetTypeIdByValue(
-                                    (value as SnabField)?.Value ?? value
-                                    ) : innerTypeId;
+                            byte innerTypeId;
+                            object? innerValue;
+                            if (value is SnabField field)
+                            {
+                                innerValue = field.Value;
+                                innerTypeId = field.TypeId == SnabType.None ?
+                                    instance.GetTypeIdByValue(innerValue) :
+                                    field.TypeId;
+                            }
+                            else 
+                            {
+                                innerValue = value;
+                                innerTypeId = instance.GetTypeIdByValue(innerValue);
+                            }
+
                             if (!instance.Info.Flags.HasFlag(SnabFlags.User) &&
                                 !instance.Info.Flags.HasFlag(SnabFlags.Extended) &&
                                 innerTypeId > SnabType.LastReserved)
