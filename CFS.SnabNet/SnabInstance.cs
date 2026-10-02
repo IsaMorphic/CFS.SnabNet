@@ -53,6 +53,16 @@ namespace CFS.SnabNet
         {
             switch (value)
             {
+                case SnabField field:
+                    if (field.TypeId == SnabType.None)
+                    {
+                        return GetTypeIdByValue(field.Value);
+                    }
+                    else
+                    {
+                        return field.TypeId;
+                    }
+
                 // Struct types
                 case ISnabStruct:
                 case IDictionary<string, object?>:
@@ -102,9 +112,6 @@ namespace CFS.SnabNet
                 // Array types
                 case IEnumerable:
                     return SnabType.Array;
-
-                case SnabField field:
-                    return field.TypeId;
 
                 default:
                     return _typeMap
