@@ -182,7 +182,7 @@ namespace CFS.SnabNet.SourceGenerators
             }
 
             BaseNamespaceDeclarationSyntax namespaceDef = oldTypeDef.Ancestors()
-                .FirstOrDefault(x => x is BaseNamespaceDeclarationSyntax) 
+                .FirstOrDefault(x => x is BaseNamespaceDeclarationSyntax)
                 as BaseNamespaceDeclarationSyntax;
             string className = string.Join(".", oldTypeDef.AncestorsAndSelf()
                 .Select(x => x as TypeDeclarationSyntax)
@@ -210,7 +210,7 @@ namespace CFS.SnabNet.SourceGenerators
                     < 0 => $"{x.s1}.{x.s2}",
                     _ => x.s1.Substring(0, x.index.Value) + x.s2
                 })
-                .Select(arr => UsingDirective(ParseName(string.Join(".", arr))))
+                .Select(s => UsingDirective(ParseName(s)))
                 .ToArray())
                 .AddMembers(
                     NamespaceDeclaration(namespaceDef?.Name ??
