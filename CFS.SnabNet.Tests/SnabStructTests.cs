@@ -134,7 +134,8 @@ namespace CFS.SnabNet.Tests
                 NestedStructField = new TestStruct1.NestedStruct()
                 {
                     NestedStringField = "Nested Hello!",
-                }
+                },
+                BufferField = [1, 2, 3],
             };
 
             SnabInstance instance = new();
@@ -155,11 +156,14 @@ namespace CFS.SnabNet.Tests
             }
 
             Assert.NotNull(actualObj.StructField);
+            Assert.NotNull(actualObj.NestedStructField);
+            Assert.NotNull(actualObj.BufferField);
             Assert.Equal(expectedObj.IntField, actualObj.IntField);
             Assert.Equal(expectedObj.RealField, actualObj.RealField);
             Assert.Equal(expectedObj.StructField.StringField, actualObj.StructField.StringField);
             Assert.Equal(expectedObj.StructField.ArrayField, actualObj.StructField.ArrayField);
             Assert.Equal(expectedObj.NestedStructField.NestedStringField, actualObj.NestedStructField.NestedStringField);
+            Assert.Equal(expectedObj.BufferField, actualObj.BufferField);
         }
     }
 }

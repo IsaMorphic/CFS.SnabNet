@@ -21,5 +21,8 @@
 
         [SnabField("nested_struct_field", SnabType.Struct)]
         public NestedStruct? NestedStructField { get; set; }
+
+        [SnabField("buffer_field", SnabType.Buffer)]
+        public byte[]? BufferField { get; set; }
     }
 }
