@@ -6,6 +6,7 @@
 		<Nullable>Disable</Nullable>
 		<MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
 		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
