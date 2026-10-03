@@ -134,8 +134,18 @@ namespace CFS.SnabNet.SourceGenerators
                             $"{(_sDefaultTypes.Contains(elemType) ? "x" : $"{elemType}.Hydrate(x as IDictionary<string, object?>)")})" +
                             $".Cast<{elemType}>()])";
                         break;
+                    case "SnabType.Buffer":
+                        fallbackExpr = $"{propName} as byte[]";
+                        break;
                     default:
-                        fallbackExpr = propDef.Type.ToString().EndsWith("?") ? "null" : "default";
+                        if (propDef.Type.ToString().EndsWith("?"))
+                        {
+                            fallbackExpr = "null";
+                        }
+                        else
+                        {  
+                            fallbackExpr = "default";
+                        }
                         break;
                 }
 
