@@ -135,7 +135,7 @@ namespace CFS.SnabNet.SourceGenerators
                             $".Cast<{elemType}>()])";
                         break;
                     default:
-                        fallbackExpr = "default";
+                        fallbackExpr = propDef.Type.ToString().EndsWith("?") ? "null" : "default";
                         break;
                 }
 
