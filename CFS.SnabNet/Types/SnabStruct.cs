@@ -69,7 +69,8 @@ namespace CFS.SnabNet.Types
                             if (value is SnabField field)
                             {
                                 innerValue = field.Value;
-                                innerTypeId = field.TypeId == SnabType.None ?
+                                innerTypeId = 
+                                    field.TypeId == SnabType.None || field.Value is null ?
                                     instance.GetTypeIdByValue(innerValue) :
                                     field.TypeId;
                             }
