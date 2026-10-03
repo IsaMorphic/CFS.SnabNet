@@ -134,9 +134,6 @@ namespace CFS.SnabNet.SourceGenerators
                             $"{(_sDefaultTypes.Contains(elemType) ? "x" : $"{elemType}.Hydrate(x as IDictionary<string, object?>)")})" +
                             $".Cast<{elemType}>()])";
                         break;
-                    case "SnabType.Buffer":
-                        fallbackExpr = $"{propName} as byte[]";
-                        break;
                     default:
                         if (propDef.Type.ToString().EndsWith("?"))
                         {
@@ -153,6 +150,7 @@ namespace CFS.SnabNet.SourceGenerators
                 hydrateMethodDef = hydrateMethodDef.AddBodyStatements(
                     IfStatement(ParseExpression($"structData.TryGetValue(\"{propName}\", out object? {propName})"),
                     ParseStatement($"inst.{propDef.Identifier} = " +
+                    $"{propName} is {propType} _{propName} ? _{propName} : " + 
                     $"({propType}?)({propName} as IConvertible)?.ToType(" +
                     $"typeof({propType}), null) ?? {fallbackExpr};"
                     )));
