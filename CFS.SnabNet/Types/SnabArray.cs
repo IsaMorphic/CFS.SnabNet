@@ -23,8 +23,8 @@ namespace CFS.SnabNet.Types
                 byte elemTypeId = reader.ReadByte();
                 while (elemTypeId != SnabType.None)
                 {
-                    if (!instance.Info.Flags.HasFlag(SnabFlags.User) &&
-                        !instance.Info.Flags.HasFlag(SnabFlags.Extended) &&
+                    if (!instance.Flags.HasFlag(SnabFlags.User) &&
+                        !instance.Flags.HasFlag(SnabFlags.Extended) &&
                         elemTypeId > SnabType.LastReserved)
                         throw new ArgumentException($"Cannot deserialize user-defined typeId {elemTypeId}; instance does not allow it.", nameof(instance));
 
@@ -48,8 +48,8 @@ namespace CFS.SnabNet.Types
                 throw new ArgumentException($"Object of type '{obj?.GetType().FullName ?? "null"}' cannot be serialized as SnabArray.", nameof(obj)))
             {
                 byte elemTypeId = instance.GetTypeIdByValue(element);
-                if (!instance.Info.Flags.HasFlag(SnabFlags.User) &&
-                    !instance.Info.Flags.HasFlag(SnabFlags.Extended) &&
+                if (!instance.Flags.HasFlag(SnabFlags.User) &&
+                    !instance.Flags.HasFlag(SnabFlags.Extended) &&
                     elemTypeId > SnabType.LastReserved)
                     throw new ArgumentException($"Cannot serialize user-defined typeId {elemTypeId}; instance does not allow it.", nameof(instance));
 

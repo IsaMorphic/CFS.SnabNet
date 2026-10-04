@@ -14,7 +14,7 @@ namespace CFS.SnabNet.Types
 
         public string ReadFromInstance(SnabReader instance, byte typeId)
         {
-            bool isBigEndian = instance.Info.Flags.HasFlag(SnabFlags.BigEndian);
+            bool isBigEndian = instance.Flags.HasFlag(SnabFlags.BigEndian);
 
             Encoding encoding;
             switch((typeId, isBigEndian)) 
@@ -49,7 +49,7 @@ namespace CFS.SnabNet.Types
 
         public void WriteToInstance(SnabWriter instance, byte typeId, object? obj)
         {
-            bool isBigEndian = instance.Info.Flags.HasFlag(SnabFlags.BigEndian);
+            bool isBigEndian = instance.Flags.HasFlag(SnabFlags.BigEndian);
 
             Encoding encoding;
             switch ((typeId, isBigEndian))

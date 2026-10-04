@@ -18,7 +18,7 @@ namespace CFS.SnabNet.Types
             Span<byte> bytesSpan = stackalloc byte[sizeof(uint)];
             instance.BaseStream.ReadExactly(bytesSpan);
             if (BitConverter.IsLittleEndian ==
-                instance.Info.Flags.HasFlag(SnabFlags.BigEndian))
+                instance.Flags.HasFlag(SnabFlags.BigEndian))
             {
                 bytesSpan.Reverse();
             }
@@ -47,7 +47,7 @@ namespace CFS.SnabNet.Types
                     Span<byte> bytesSpan = stackalloc byte[sizeof(int)];
                     BitConverter.TryWriteBytes(bytesSpan, buffer.Length);
                     if (BitConverter.IsLittleEndian ==
-                        instance.Info.Flags.HasFlag(SnabFlags.BigEndian))
+                        instance.Flags.HasFlag(SnabFlags.BigEndian))
                     {
                         bytesSpan.Reverse();
                     }
