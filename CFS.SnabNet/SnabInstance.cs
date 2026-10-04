@@ -1,4 +1,5 @@
 ﻿using CFS.SnabNet.Types;
+using CFS.SnabNet.Types.Extensions;
 using System.Collections;
 using System.Text;
 
@@ -24,7 +25,7 @@ namespace CFS.SnabNet
 
         private readonly SortedDictionary<byte, ISnabType> _typeMap = new();
 
-        public SnabInstance()
+        public SnabInstance(bool includeExtTypes = false)
         {
             RegisterType<SnabStruct>(isDefaultType: true);
             RegisterType<SnabArray>(isDefaultType: true);
@@ -35,6 +36,12 @@ namespace CFS.SnabNet
             RegisterType<SnabUndefined>(isDefaultType: true);
             RegisterType<SnabNull>(isDefaultType: true);
             RegisterType<SnabBuffer>(isDefaultType: true);
+
+            // Register extension types if requested
+            if (includeExtTypes) 
+            {
+                RegisterType<SnabGuid>();
+            }
         }
 
         internal ISnabType GetTypeById(byte typeId)

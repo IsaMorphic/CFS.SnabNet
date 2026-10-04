@@ -2,6 +2,8 @@
 {
     public static class SnabType
     {
+        // Core types
+
         public const byte None = 0x00;
 
         public const byte Struct = 0x01;
@@ -27,5 +29,9 @@
         public const byte Buffer = 0x0B;
 
         public const byte LastReserved = 0x7F;
+
+        // Extension types
+
+        public const byte Guid = 0x80;
     }
 }
