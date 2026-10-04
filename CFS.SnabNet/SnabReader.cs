@@ -9,11 +9,13 @@ namespace CFS.SnabNet
 
         private readonly Crc32Stream _stream;
 
+        private readonly SnabHeader _header;
+
         private readonly bool _leaveOpen;
 
         private bool _disposedValue;
 
-        internal SnabHeader Info { get; }
+        public SnabFlags Flags { get; }
 
         public Stream BaseStream { get; }
 
@@ -22,10 +24,11 @@ namespace CFS.SnabNet
             _instance = instance;
             _leaveOpen = leaveOpen;
 
-            Info = header ?? SnabHeader.ReadFromStream(stream);
+            _header = header ?? SnabHeader.ReadFromStream(stream);
+            Flags = _header.Flags;
 
             _stream = new Crc32Stream(stream);
-            if (Info.Flags.HasFlag(SnabFlags.Compressed))
+            if (_header.Flags.HasFlag(SnabFlags.Compressed))
             {
                 BaseStream = new ZLibStream(_stream, CompressionMode.Decompress, leaveOpen);
             }
@@ -57,12 +60,12 @@ namespace CFS.SnabNet
                     throw new EndOfStreamException("Unexpected end of stream while reading SNAB data.");
             }
 
-            if(_stream.Position - SnabHeader.HEADER_SIZE != Info.Length)
+            if(_stream.Position - SnabHeader.HEADER_SIZE != _header.Length)
             {
-                throw new InvalidDataException($"SNAB data integrity check failed: expected length {Info.Length} bytes, but read {_stream.Position} bytes.");
+                throw new InvalidDataException($"SNAB data integrity check failed: expected length {_header.Length} bytes, but read {_stream.Position} bytes.");
             }
 
-            if (_stream.Crc32Value != Info.Checksum)
+            if (_stream.Crc32Value != _header.Checksum)
             {
                 throw new InvalidDataException("SNAB data integrity check failed: CRC32 checksum does not match the expected value.");
             }

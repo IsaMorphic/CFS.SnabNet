@@ -18,7 +18,7 @@
             instance.BaseStream.ReadExactly(bytesSpan);
 
             if (BitConverter.IsLittleEndian ==
-                instance.Info.Flags.HasFlag(SnabFlags.BigEndian))
+                instance.Flags.HasFlag(SnabFlags.BigEndian))
             {
                 bytesSpan.Reverse();
             }
@@ -71,7 +71,7 @@
             Span<byte> bytesSpan = stackalloc byte[sizeof(long)];
             BitConverter.TryWriteBytes(bytesSpan, value);
             if (BitConverter.IsLittleEndian ==
-                instance.Info.Flags.HasFlag(SnabFlags.BigEndian))
+                instance.Flags.HasFlag(SnabFlags.BigEndian))
             {
                 bytesSpan.Reverse();
             }

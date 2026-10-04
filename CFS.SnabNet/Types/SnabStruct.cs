@@ -23,8 +23,8 @@ namespace CFS.SnabNet.Types
                 byte innerTypeId = reader.ReadByte();
                 while (innerTypeId != SnabType.None)
                 {
-                    if (!instance.Info.Flags.HasFlag(SnabFlags.User) && 
-                        !instance.Info.Flags.HasFlag(SnabFlags.Extended) && 
+                    if (!instance.Flags.HasFlag(SnabFlags.User) && 
+                        !instance.Flags.HasFlag(SnabFlags.Extended) && 
                         innerTypeId > SnabType.LastReserved)
                         throw new ArgumentException($"Cannot deserialize user-defined typeId {innerTypeId}; instance does not allow it.", nameof(instance));
 
@@ -80,8 +80,8 @@ namespace CFS.SnabNet.Types
                                 innerTypeId = instance.GetTypeIdByValue(innerValue);
                             }
 
-                            if (!instance.Info.Flags.HasFlag(SnabFlags.User) &&
-                                !instance.Info.Flags.HasFlag(SnabFlags.Extended) &&
+                            if (!instance.Flags.HasFlag(SnabFlags.User) &&
+                                !instance.Flags.HasFlag(SnabFlags.Extended) &&
                                 innerTypeId > SnabType.LastReserved)
                                 throw new ArgumentException($"Cannot serialize user-defined typeId {innerTypeId}; instance does not allow it.", nameof(instance));
 

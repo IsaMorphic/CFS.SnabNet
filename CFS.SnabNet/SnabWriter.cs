@@ -7,6 +7,8 @@ namespace CFS.SnabNet
     {
         private readonly SnabInstance _instance;
 
+        private readonly SnabHeader _header;
+
         private readonly Stream _stream;
         private readonly bool _leaveOpen;
 
@@ -15,7 +17,7 @@ namespace CFS.SnabNet
 
         private bool _disposedValue;
 
-        internal SnabHeader Info { get; }
+        public SnabFlags Flags { get; }
 
         public Stream BaseStream { get; }
 
@@ -26,13 +28,15 @@ namespace CFS.SnabNet
             _stream = stream;
             _leaveOpen = leaveOpen;
 
-            Info = new SnabHeader()
+            _header = new SnabHeader()
             {
                 MajorVersion = SnabInstance.MAJOR_VERSION,
                 MinorVersion = SnabInstance.MINOR_VERSION,
                 LangId = SnabInstance.LANG_ID,
                 Flags = flags,
             };
+
+            Flags = flags;
 
             _buffer = buffer ?? new MemoryStream();
             if (flags.HasFlag(SnabFlags.Compressed))
@@ -80,9 +84,9 @@ namespace CFS.SnabNet
                 bufferArr = _buffer.ToArray();
             }
 
-            Info.Checksum = Crc32.HashToUInt32(bufferArr);
-            Info.Length = (uint)bufferArr.Length;
-            Info.WriteToStream(_stream);
+            _header.Checksum = Crc32.HashToUInt32(bufferArr);
+            _header.Length = (uint)bufferArr.Length;
+            _header.WriteToStream(_stream);
 
             _stream.Write(bufferArr, 0, bufferArr.Length);
             _isCompleted = true;
