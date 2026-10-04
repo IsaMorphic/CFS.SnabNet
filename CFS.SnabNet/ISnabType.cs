@@ -8,7 +8,7 @@
 
         void WriteToInstance(SnabWriter instance, byte typeId, object? obj);
 
-        byte GetTypeIdForValue(object? value) => 0x00;
+        byte GetTypeIdForValue(object? value) => SnabType.None;
     }
 
     public interface ISnabType<T> : ISnabType
