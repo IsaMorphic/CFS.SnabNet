@@ -18,8 +18,7 @@
             // Act
             SnabHeader header = SnabHeader.ReadFromStream(stream);
             // Assert
-            Assert.Equal(1, header.MajorVersion);
-            Assert.Equal(0, header.MinorVersion);
+            Assert.Equal(new SnabVersion(1, 0), header.Version);
             Assert.Equal(SnabFlags.BigEndian | SnabFlags.Extended, header.Flags);
             Assert.Equal(0x00005343u, header.LangId);
             Assert.Equal(0x12345678u, header.Checksum);
@@ -32,8 +31,7 @@
             // Arrange
             SnabHeader header = new()
             {
-                MajorVersion = 1,
-                MinorVersion = 0,
+                Version = new SnabVersion(1, 0),
                 Flags = SnabFlags.BigEndian | SnabFlags.Extended,
                 LangId = 0x00005343u, // "CS\x00\x00"
                 Checksum = 0x12345678u,
