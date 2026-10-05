@@ -1,5 +1,4 @@
 ﻿using CFS.SnabNet.Types;
-using CFS.SnabNet.Types.Extension;
 using System.Collections;
 using System.Text;
 
@@ -8,15 +7,15 @@ namespace CFS.SnabNet
     public class SnabInstance
     {
         public const byte MAJOR_VERSION = 1;
-        public const byte MINOR_VERSION = 0;
+        public const byte MINOR_VERSION = 1;
 
         private const string _LANG_ID = "CS\x00\x00";
         public static readonly uint LANG_ID;
 
-        static SnabInstance() 
+        static SnabInstance()
         {
             Span<byte> langIdSpan = Encoding.ASCII.GetBytes(_LANG_ID);
-            if (!BitConverter.IsLittleEndian) 
+            if (!BitConverter.IsLittleEndian)
             {
                 langIdSpan.Reverse();
             }
@@ -36,12 +35,7 @@ namespace CFS.SnabNet
             RegisterType<SnabUndefined>(isDefaultType: true);
             RegisterType<SnabNull>(isDefaultType: true);
             RegisterType<SnabBuffer>(isDefaultType: true);
-
-            // Register extension types if requested
-            if (includeExtTypes) 
-            {
-                RegisterType<SnabGuid>();
-            }
+            RegisterType<SnabGuid>(isDefaultType: true);
         }
 
         internal ISnabType GetTypeById(byte typeId)
@@ -106,6 +100,10 @@ namespace CFS.SnabNet
                 case byte[]:
                     return SnabType.Buffer;
 
+                // GUID types
+                case Guid:
+                    return SnabType.Guid;
+
                 // Array types
                 case IEnumerable:
                     return SnabType.Array;
@@ -114,7 +112,7 @@ namespace CFS.SnabNet
                     return _typeMap
                         .SkipWhile(x => x.Key <= SnabType.LastReserved)
                         .Select(x => (byte?)x.Value.GetTypeIdForValue(value))
-                        .FirstOrDefault(id => id > SnabType.None) ?? 
+                        .FirstOrDefault(id => id > SnabType.None) ??
                         throw new ArgumentException($"Unsupported value type {value.GetType().FullName}", nameof(value));
             }
         }
@@ -132,7 +130,7 @@ namespace CFS.SnabNet
             {
                 throw new ArgumentException($"Instance already contains a mapping for typeIds: {string.Join(", ", conflictIds)}", nameof(T));
             }
-            else 
+            else
             {
                 foreach (byte typeId in type.TypeIds)
                 {

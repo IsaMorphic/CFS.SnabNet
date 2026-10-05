@@ -80,9 +80,12 @@ namespace CFS.SnabNet.Types
                                 innerTypeId = instance.GetTypeIdByValue(innerValue);
                             }
 
-                            if (!instance.Flags.HasFlag(SnabFlags.User) &&
-                                !instance.Flags.HasFlag(SnabFlags.Extended) &&
+                            if (!instance.Flags.HasFlag(SnabFlags.Extended) &&
                                 innerTypeId > SnabType.LastReserved)
+                                throw new ArgumentException($"Cannot serialize extended typeId {innerTypeId}; instance does not allow it.", nameof(instance));
+
+                            if (!instance.Flags.HasFlag(SnabFlags.User) &&
+                                innerTypeId > SnabType.LastExtension)
                                 throw new ArgumentException($"Cannot serialize user-defined typeId {innerTypeId}; instance does not allow it.", nameof(instance));
 
                             ISnabType innerType = instance.GetTypeById(innerTypeId);

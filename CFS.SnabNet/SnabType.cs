@@ -28,10 +28,10 @@
 
         public const byte Buffer = 0x0B;
 
+        public const byte Guid = 0x0C;
+
         public const byte LastReserved = 0x7F;
 
-        // Extension types
-
-        public const byte Guid = 0x80;
+        public const byte LastExtension = 0xBF;
     }
 }

@@ -8,11 +8,12 @@ namespace CFS.SnabNet.Tests
         [InlineData([true])]
         public void ShouldReadCorrectly(bool isBigEndian)
         {
-            SnabInstance instance = new SnabInstance(includeExtTypes: true);
+            SnabInstance instance = new SnabInstance();
             SnabHeader header = new SnabHeader()
             {
                 Flags = isBigEndian ?
                 SnabFlags.BigEndian : SnabFlags.None,
+                Version = new(SnabInstance.MAJOR_VERSION, SnabInstance.MINOR_VERSION),
             };
 
             Guid n = Guid.NewGuid();
@@ -35,7 +36,7 @@ namespace CFS.SnabNet.Tests
         [InlineData([true])]
         public void ShouldWriteCorrectly(bool isBigEndian)
         {
-            SnabInstance instance = new SnabInstance(includeExtTypes: true);
+            SnabInstance instance = new SnabInstance();
             Guid n = Guid.NewGuid();
 
             byte[] expectedBytes = new byte[16];
