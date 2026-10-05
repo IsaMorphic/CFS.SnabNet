@@ -1,5 +1,5 @@
 ﻿using CFS.SnabNet.Types;
-using CFS.SnabNet.Types.Extensions;
+using CFS.SnabNet.Types.Extension;
 using System.Collections;
 using System.Text;
 
