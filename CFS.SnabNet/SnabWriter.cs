@@ -19,6 +19,8 @@ namespace CFS.SnabNet
 
         public SnabFlags Flags { get; }
 
+        public SnabVersion Version { get; }
+
         public Stream BaseStream { get; }
 
         internal SnabWriter(SnabInstance instance, MemoryStream? buffer, Stream stream, SnabFlags flags, bool leaveOpen)
@@ -28,15 +30,16 @@ namespace CFS.SnabNet
             _stream = stream;
             _leaveOpen = leaveOpen;
 
+            SnabVersion version = new(SnabInstance.MAJOR_VERSION, SnabInstance.MINOR_VERSION);
             _header = new SnabHeader()
             {
-                MajorVersion = SnabInstance.MAJOR_VERSION,
-                MinorVersion = SnabInstance.MINOR_VERSION,
                 LangId = SnabInstance.LANG_ID,
                 Flags = flags,
+                Version = version,
             };
 
             Flags = flags;
+            Version = version;
 
             _buffer = buffer ?? new MemoryStream();
             if (flags.HasFlag(SnabFlags.Compressed))

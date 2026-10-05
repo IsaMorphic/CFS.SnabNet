@@ -17,6 +17,8 @@ namespace CFS.SnabNet
 
         public SnabFlags Flags { get; }
 
+        public SnabVersion Version { get; }
+
         public Stream BaseStream { get; }
 
         internal SnabReader(SnabInstance instance, SnabHeader? header, Stream stream, bool leaveOpen)
@@ -25,7 +27,9 @@ namespace CFS.SnabNet
             _leaveOpen = leaveOpen;
 
             _header = header ?? SnabHeader.ReadFromStream(stream);
+
             Flags = _header.Flags;
+            Version = _header.Version;
 
             _stream = new Crc32Stream(stream);
             if (_header.Flags.HasFlag(SnabFlags.Compressed))
