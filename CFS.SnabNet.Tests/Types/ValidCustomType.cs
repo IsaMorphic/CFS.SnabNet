@@ -2,7 +2,7 @@
 {
     internal class ValidCustomType : ISnabType
     {
-        public const byte TypeId = 0x80;
+        public const byte TypeId = 0x81;
 
         public HashSet<byte> TypeIds { get; }
 

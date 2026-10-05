@@ -48,9 +48,13 @@ namespace CFS.SnabNet.Types
                 throw new ArgumentException($"Object of type '{obj?.GetType().FullName ?? "null"}' cannot be serialized as SnabArray.", nameof(obj)))
             {
                 byte elemTypeId = instance.GetTypeIdByValue(element);
-                if (!instance.Flags.HasFlag(SnabFlags.User) &&
-                    !instance.Flags.HasFlag(SnabFlags.Extended) &&
+
+                if (!instance.Flags.HasFlag(SnabFlags.Extended) &&
                     elemTypeId > SnabType.LastReserved)
+                    throw new ArgumentException($"Cannot serialize extended typeId {elemTypeId}; instance does not allow it.", nameof(instance));
+
+                if (!instance.Flags.HasFlag(SnabFlags.User) &&
+                    elemTypeId > SnabType.LastExtension)
                     throw new ArgumentException($"Cannot serialize user-defined typeId {elemTypeId}; instance does not allow it.", nameof(instance));
 
                 ISnabType elemType = instance.GetTypeById(elemTypeId);
