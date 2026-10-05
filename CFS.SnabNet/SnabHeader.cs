@@ -4,9 +4,7 @@
     {
         public const int HEADER_SIZE = 16;
 
-        public byte MajorVersion { get; internal set; }
-
-        public byte MinorVersion { get; internal set; }
+        public SnabVersion Version { get; internal set; }
 
         public SnabFlags Flags { get; internal set; }
 
@@ -23,6 +21,7 @@
 
             byte majorVersion = bytesSpan[0];
             byte minorVersion = bytesSpan[1];
+            SnabVersion version = new(majorVersion, minorVersion);
 
             SnabFlags flags;
             stream.ReadExactly(bytesSpan[..2]);
@@ -58,8 +57,7 @@
 
             return new()
             {
-                MajorVersion = majorVersion,
-                MinorVersion = minorVersion,
+                Version = version,
                 Flags = flags,
                 LangId = langIndicator,
                 Checksum = checksum,
@@ -71,8 +69,8 @@
         {
             Span<byte> bytesSpan = stackalloc byte[sizeof(uint)];
 
-            stream.WriteByte(MajorVersion);
-            stream.WriteByte(MinorVersion);
+            stream.WriteByte(Version.Major);
+            stream.WriteByte(Version.Minor);
 
             BitConverter.TryWriteBytes(bytesSpan, (ushort)Flags);
             if (!BitConverter.IsLittleEndian)
