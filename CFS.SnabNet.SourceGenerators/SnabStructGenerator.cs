@@ -130,7 +130,7 @@ namespace CFS.SnabNet.SourceGenerators
                         string elemType = propDef.Type.ToString().TrimEnd('[', ']', '?');
                         fallbackExpr = $"({propDef.Type})({propName} is null ? " +
                             $"null : [..((IList<object?>){propName})" +
-                            $".Select(x => (x as IConvertible)?.ToType(typeof({elemType}), null) ?? " +
+                            $".Select(x => x is {elemType} _x ? _x : (x as IConvertible)?.ToType(typeof({elemType}), null) ?? " +
                             $"{(_sDefaultTypes.Contains(elemType) ? "x" : $"{elemType}.Hydrate(x as IDictionary<string, object?>)")})" +
                             $".Cast<{elemType}>()])";
                         break;
