@@ -23,10 +23,13 @@ namespace CFS.SnabNet.Types
                 byte innerTypeId = reader.ReadByte();
                 while (innerTypeId != SnabType.None)
                 {
-                    if (!instance.Flags.HasFlag(SnabFlags.User) && 
-                        !instance.Flags.HasFlag(SnabFlags.Extended) && 
-                        innerTypeId > SnabType.LastReserved)
+                    if (!instance.Flags.HasFlag(SnabFlags.User) &&
+                        innerTypeId > SnabType.LastExtension)
                         throw new ArgumentException($"Cannot deserialize user-defined typeId {innerTypeId}; instance does not allow it.", nameof(instance));
+
+                    if (!instance.Flags.HasFlag(SnabFlags.Extended) &&
+                        innerTypeId > SnabType.LastReserved && innerTypeId <= SnabType.LastExtension)
+                        throw new ArgumentException($"Cannot deserialize extended typeId {innerTypeId}; instance does not allow it.", nameof(instance));
 
                     List<char> strBuf = new();
                     char nextChar = reader.ReadChar();
@@ -80,13 +83,13 @@ namespace CFS.SnabNet.Types
                                 innerTypeId = instance.GetTypeIdByValue(innerValue);
                             }
 
-                            if (!instance.Flags.HasFlag(SnabFlags.Extended) &&
-                                innerTypeId > SnabType.LastReserved)
-                                throw new ArgumentException($"Cannot serialize extended typeId {innerTypeId}; instance does not allow it.", nameof(instance));
-
                             if (!instance.Flags.HasFlag(SnabFlags.User) &&
                                 innerTypeId > SnabType.LastExtension)
                                 throw new ArgumentException($"Cannot serialize user-defined typeId {innerTypeId}; instance does not allow it.", nameof(instance));
+
+                            if (!instance.Flags.HasFlag(SnabFlags.Extended) &&
+                                innerTypeId > SnabType.LastReserved && innerTypeId <= SnabType.LastExtension)
+                                throw new ArgumentException($"Cannot serialize extended typeId {innerTypeId}; instance does not allow it.", nameof(instance));
 
                             ISnabType innerType = instance.GetTypeById(innerTypeId);
                             writer.Write(innerTypeId);
