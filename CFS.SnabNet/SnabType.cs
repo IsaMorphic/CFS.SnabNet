@@ -32,6 +32,10 @@
 
         public const byte LastReserved = 0x7F;
 
+        // Extension types
+
+        public const byte BigReal = 0x81;
+
         public const byte LastExtension = 0xBF;
     }
 }

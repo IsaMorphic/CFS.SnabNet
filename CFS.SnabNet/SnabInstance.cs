@@ -1,4 +1,5 @@
 ﻿using CFS.SnabNet.Types;
+using CFS.SnabNet.Types.Extension;
 using System.Collections;
 using System.Text;
 
@@ -26,6 +27,11 @@ namespace CFS.SnabNet
 
         public SnabInstance(bool includeExtTypes = false)
         {
+            if (includeExtTypes)
+            {
+                RegisterType<SnabBigReal>(isDefaultType: false);
+            }
+
             RegisterType<SnabStruct>(isDefaultType: true);
             RegisterType<SnabArray>(isDefaultType: true);
             RegisterType<SnabString>(isDefaultType: true);
