@@ -1,7 +1,6 @@
 # CFS.SnabNet
 
-[![.NET](https://github.com/IsaMorphic/CFS.SnabNet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/IsaMorphic/CFS.SnabNet/actions/workflows/dotnet.yml)
-[![NuGet](https://github.com/IsaMorphic/CFS.SnabNet/actions/workflows/nuget.yml/badge.svg)](https://github.com/IsaMorphic/CFS.SnabNet/actions/workflows/nuget.yml)
+[![.NET](https://github.com/IsaMorphic/CFS.SnabNet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/IsaMorphic/CFS.SnabNet/actions/workflows/dotnet.yml) [![NuGet](https://github.com/IsaMorphic/CFS.SnabNet/actions/workflows/nuget.yml/badge.svg)](https://github.com/IsaMorphic/CFS.SnabNet/actions/workflows/nuget.yml) [![NuGet Version](https://img.shields.io/nuget/v/ChosenFewSoftware.SnabNet?label=NuGet%20version)](https://www.nuget.org/packages/ChosenFewSoftware.SnabNet)
 
 *SnabNet*, also known as *SNAB.NET* is a barebones, no nonsense implementation of the [SNAB generalized bitstream format](https://github.com/AlubJ/SNAB) for efficient, low-overhead, high-performance serialization with support for multiple programming languages and cross-platform scenarios. Importantly, this implementation supports all official versions of the original specification and includes goodies for parsing and serializing arbitrary data in a flexible fashion. 
 
