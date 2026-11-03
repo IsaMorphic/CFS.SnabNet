@@ -13,7 +13,7 @@ namespace CFS.SnabNet.Tests
         [InlineData([1, true])]
         [InlineData([2.5, true])]
         [InlineData([3.1415, true])]
-        public void DoesReadCorrectly(Float128 x, bool isBigEndian) 
+        public void DoesReadCorrectly(double x, bool isBigEndian) 
         {
             SnabInstance instance = new SnabInstance(includeExtTypes: true);
             SnabHeader header = new SnabHeader()
@@ -22,7 +22,7 @@ namespace CFS.SnabNet.Tests
                 SnabFlags.BigEndian : SnabFlags.None,
             };
 
-            byte[] realBytes = [.. MemoryMarshal.AsBytes([x])];
+            byte[] realBytes = [.. MemoryMarshal.AsBytes([(Float128)x])];
             if (BitConverter.IsLittleEndian == isBigEndian) 
             {
                 Array.Reverse(realBytes);
@@ -46,10 +46,11 @@ namespace CFS.SnabNet.Tests
         [InlineData([1, true])]
         [InlineData([2.5, true])]
         [InlineData([3.1415, true])]
-        public void DoesWriteCorrectly(Float128 x, bool isBigEndian)
+        public void DoesWriteCorrectly(double x, bool isBigEndian)
         {
             SnabInstance instance = new(includeExtTypes: true);
-            byte[] expectedBytes = [.. MemoryMarshal.AsBytes([x])];
+
+            byte[] expectedBytes = [.. MemoryMarshal.AsBytes([(Float128)x])];
             if (BitConverter.IsLittleEndian == isBigEndian) 
             {
                 Array.Reverse(expectedBytes);
